@@ -14,6 +14,45 @@
         -webkit-touch-callout: none;
       }
     </style>
+    <script>
+      // Translate touch drag to mouse events for iOS camera look controls
+      (function() {
+        var container = null;
+        function attach() {
+          container = document.getElementById("scene-container");
+          if (!container) { setTimeout(attach, 500); return; }
+          var lastX = 0, lastY = 0, dragging = false;
+          function mouseEvent(type, touch) {
+            var e = new MouseEvent(type, {
+              clientX: touch.clientX, clientY: touch.clientY,
+              bubbles: true, cancelable: true
+            });
+            (touch.target || container).dispatchEvent(e);
+          }
+          container.addEventListener("touchstart", function(e) {
+            if (e.touches.length === 1) {
+              dragging = true;
+              lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+              mouseEvent("mousedown", e.touches[0]);
+            }
+          }, {passive: true});
+          container.addEventListener("touchmove", function(e) {
+            if (dragging && e.touches.length === 1) {
+              e.preventDefault();
+              mouseEvent("mousemove", e.touches[0]);
+            }
+          }, {passive: false});
+          function end(e) {
+            if (dragging) { dragging = false; mouseEvent("mouseup", (e.changedTouches||[])[0]||{}); }
+          }
+          container.addEventListener("touchend", end, {passive: true});
+          container.addEventListener("touchcancel", end, {passive: true});
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", attach);
+        } else { attach(); }
+      })();
+    </script>
     <script type="module" crossorigin src="./assets/index-BeuvGpZ2.js"></script>
   </head>
   <body>
