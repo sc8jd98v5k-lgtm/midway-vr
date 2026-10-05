@@ -2,12 +2,42 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" href="data:," />
     <title>Midway VR</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; }
+      #scene-container, #scene-container canvas { touch-action: none; }
+    </style>
+    <script>
+      // iOS Safari: keep pointermove flowing during touch drag (prevents pointercancel scroll hijack).
+      // Minimal and scoped: no event synthesis, no global preventDefault.
+      (function() {
+        function init() {
+          var el = document.getElementById("scene-container");
+          if (!el) { setTimeout(init, 300); return; }
+          var activePointerId = null;
+          el.addEventListener("pointerdown", function(e) {
+            if (e.pointerType === "touch") {
+              activePointerId = e.pointerId;
+              try { el.setPointerCapture(e.pointerId); } catch (_) {}
+            }
+          });
+          // Mount-time, non-passive backstop for iOS touch-action bugs.
+          el.addEventListener("touchmove", function(e) {
+            if (activePointerId !== null) e.preventDefault();
+          }, { passive: false });
+          function end(e) { if (e.pointerId === activePointerId) activePointerId = null; }
+          el.addEventListener("pointerup", end);
+          el.addEventListener("pointercancel", end);
+        }
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+        else init();
+      })();
+    </script>
     <script type="module" crossorigin src="./assets/index-BeuvGpZ2.js"></script>
   </head>
-  <body style="margin: 0">
+  <body>
     <div id="scene-container"></div>
   </body>
 </html>
