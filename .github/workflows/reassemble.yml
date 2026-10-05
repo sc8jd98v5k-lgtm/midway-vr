@@ -7,6 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          mkdir -p assets textures
           curl -sL "https://muse.ai/files/671207786067840/1695449875538330/0ixmeurze2zyysghr906c5oh/index-BeuvGpZ2.js" -o assets/index-BeuvGpZ2.js
           curl -sL "https://muse.ai/files/671207786067840/1528132465883594/oo616o64paz0wrcapd6b8ue0/inter-BNVRAYFH.js" -o assets/inter-BNVRAYFH.js
           curl -sL "https://muse.ai/files/671207786067840/1286317166915019/scrjbqk5wf0y26jkl7jw9hsu/msdf-worker-BUaSHgMS.js" -o assets/msdf-worker-BUaSHgMS.js
