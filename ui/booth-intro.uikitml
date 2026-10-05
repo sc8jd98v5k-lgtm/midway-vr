@@ -1,0 +1,18 @@
+<div id="BoothIntroRoot" style="width: 130; background-color: #171226; border-color: #ffd166; border-width: 1; border-radius: 4; padding-top: 7; padding-right: 9; padding-bottom: 7; padding-left: 9; display: flex; flex-direction: column; align-items: center; gap: 5;">
+  <style>
+    .title { font-size: 6; font-weight: 700; color: #ffd166; text-align: center; }
+    .rules { font-size: 3.1; color: #f5f0ff; text-align: center; }
+    .best { font-size: 3.1; font-weight: 700; color: #06d6a0; text-align: center; }
+    .btn { font-size: 4; font-weight: 700; color: #1a1428; background-color: #ffd166; border-radius: 3; padding-top: 3; padding-right: 10; padding-bottom: 3; padding-left: 10; cursor: pointer; text-align: center; }
+    .btn-ghost { font-size: 3.4; font-weight: 700; color: #ffd166; background-color: #2a2140; border-color: #ffd166; border-width: 0.6; border-radius: 3; padding-top: 2.4; padding-right: 8; padding-bottom: 2.4; padding-left: 8; cursor: pointer; text-align: center; }
+    .row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5; }
+  </style>
+  <div id="IntroTitle" class="title">Booth</div>
+  <div id="IntroRules" class="rules">Rules go here.</div>
+  <div id="IntroBest" class="best">No score yet - set the bar!</div>
+  <div class="row">
+    <button id="BtnStart" class="btn">START</button>
+    <button id="BtnClose" class="btn-ghost">X</button>
+  </div>
+  <button id="BtnEnterVR" class="btn-ghost">Enter VR</button>
+</div>
