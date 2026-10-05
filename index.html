@@ -2,48 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="icon" href="data:," />
     <title>Midway VR</title>
-    <style>
-      html, body { margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; position: fixed; width: 100%; height: 100%; }
-      #scene-container, #scene-container canvas, #scene-container * {
-        touch-action: none !important;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-touch-callout: none;
-      }
-    </style>
-    <script>
-      // iOS Safari: ensure touch drag generates PointerEvents for camera look
-      (function() {
-        function fix() {
-          var c = document.getElementById("scene-container");
-          if (!c) { setTimeout(fix, 300); return; }
-          // Force touch-action none on all current and future canvases
-          var obs = new MutationObserver(function() {
-            c.querySelectorAll("canvas").forEach(function(cv) {
-              cv.style.touchAction = "none";
-            });
-          });
-          obs.observe(c, {childList: true, subtree: true});
-          c.querySelectorAll("canvas").forEach(function(cv) { cv.style.touchAction = "none"; });
-          // Prevent iOS double-tap zoom and scroll interference
-          var lastTouch = 0;
-          document.addEventListener("touchend", function(e) {
-            var now = Date.now();
-            if (now - lastTouch < 300) e.preventDefault();
-            lastTouch = now;
-          }, {passive: false});
-          document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, {passive: false});
-        }
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix);
-        else fix();
-      })();
-    </script>
     <script type="module" crossorigin src="./assets/index-BeuvGpZ2.js"></script>
   </head>
-  <body>
+  <body style="margin: 0">
     <div id="scene-container"></div>
   </body>
 </html>
