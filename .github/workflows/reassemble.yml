@@ -8,12 +8,13 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           mkdir -p assets textures
-          curl -sL "https://muse.ai/files/671207786067840/1695449875538330/0ixmeurze2zyysghr906c5oh/index-BeuvGpZ2.js" -o assets/index-BeuvGpZ2.js
+          curl -sL "https://muse.ai/files/671207786067840/2946107459061124/0tz391bvbeienu8usl4f52mq/index-CVj3zZHU.js" -o assets/index-CVj3zZHU.js
+          rm -f assets/index-BeuvGpZ2.js
           curl -sL "https://muse.ai/files/671207786067840/1528132465883594/oo616o64paz0wrcapd6b8ue0/inter-BNVRAYFH.js" -o assets/inter-BNVRAYFH.js
           curl -sL "https://muse.ai/files/671207786067840/1286317166915019/scrjbqk5wf0y26jkl7jw9hsu/msdf-worker-BUaSHgMS.js" -o assets/msdf-worker-BUaSHgMS.js
           curl -sL "https://muse.ai/files/671207786067840/1070492532534691/trbbisw66w5bmfwsnn33new5/worker-BkRtSCqm.js" -o assets/worker-BkRtSCqm.js
           curl -sL "https://muse.ai/files/671207786067840/1772753260497752/i1cuy1w5w0anhf3gzg3rjteu/webxr.png" -o textures/webxr.png
-          ls -lh assets/index-BeuvGpZ2.js textures/webxr.png
+          ls -lh assets/index-CVj3zZHU.js textures/webxr.png
           git config user.name bot; git config user.email bot@bot.com; git add -A; git commit -m "Download large files" || true; git push
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
