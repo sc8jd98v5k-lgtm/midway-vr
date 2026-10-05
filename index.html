@@ -2,15 +2,21 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
     <link rel="icon" href="data:," />
-    <title>balloon-pop-vr</title>
+    <title>Midway VR</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; }
+      #scene-container, #scene-container canvas {
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+    </style>
     <script type="module" crossorigin src="./assets/index-BeuvGpZ2.js"></script>
   </head>
-  <body style="margin: 0">
+  <body>
     <div id="scene-container"></div>
   </body>
 </html>
