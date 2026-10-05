@@ -1,0 +1,21 @@
+<div id="PrizeCounterRoot" style="width: 130; background-color: #171226; border-color: #ffd166; border-width: 1; border-radius: 4; padding-top: 7; padding-right: 9; padding-bottom: 7; padding-left: 9; display: flex; flex-direction: column; align-items: center; gap: 4;">
+  <style>
+    .title { font-size: 5; font-weight: 700; color: #ffd166; text-align: center; }
+    .tickets { font-size: 4; font-weight: 700; color: #06d6a0; text-align: center; }
+    .detail { font-size: 3.2; color: #cfc4ee; text-align: center; }
+    .btn { font-size: 4; font-weight: 700; color: #1a1428; background-color: #ffd166; border-radius: 3; padding-top: 3; padding-right: 10; padding-bottom: 3; padding-left: 10; cursor: pointer; text-align: center; }
+    .btn-ghost { font-size: 3.6; font-weight: 700; color: #ffd166; background-color: #2a2140; border-color: #ffd166; border-width: 0.6; border-radius: 3; padding-top: 2.6; padding-right: 9; padding-bottom: 2.6; padding-left: 9; cursor: pointer; text-align: center; }
+    .row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5; }
+  </style>
+  <div id="PrizeTitle" class="title">PRIZE COUNTER</div>
+  <div id="PrizeTickets" class="tickets">0 tickets</div>
+  <div id="PrizeDetail" class="detail">Browse the prizes. All cosmetic, zero gameplay effect.</div>
+  <div class="row">
+    <button id="BtnPrev" class="btn-ghost">PREV</button>
+    <button id="BtnNext" class="btn-ghost">NEXT</button>
+  </div>
+  <div class="row">
+    <button id="BtnBuyEquip" class="btn">BUY</button>
+    <button id="BtnClosePrizes" class="btn-ghost">CLOSE</button>
+  </div>
+</div>
