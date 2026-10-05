@@ -2,55 +2,43 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <link rel="icon" href="data:," />
     <title>Midway VR</title>
     <style>
-      html, body { margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; }
-      #scene-container, #scene-container canvas {
-        touch-action: none;
+      html, body { margin: 0; padding: 0; overflow: hidden; overscroll-behavior: none; position: fixed; width: 100%; height: 100%; }
+      #scene-container, #scene-container canvas, #scene-container * {
+        touch-action: none !important;
         -webkit-user-select: none;
         user-select: none;
         -webkit-touch-callout: none;
       }
     </style>
     <script>
-      // Translate touch drag to mouse events for iOS camera look controls
+      // iOS Safari: ensure touch drag generates PointerEvents for camera look
       (function() {
-        var container = null;
-        function attach() {
-          container = document.getElementById("scene-container");
-          if (!container) { setTimeout(attach, 500); return; }
-          var lastX = 0, lastY = 0, dragging = false;
-          function mouseEvent(type, touch) {
-            var e = new MouseEvent(type, {
-              clientX: touch.clientX, clientY: touch.clientY,
-              bubbles: true, cancelable: true
+        function fix() {
+          var c = document.getElementById("scene-container");
+          if (!c) { setTimeout(fix, 300); return; }
+          // Force touch-action none on all current and future canvases
+          var obs = new MutationObserver(function() {
+            c.querySelectorAll("canvas").forEach(function(cv) {
+              cv.style.touchAction = "none";
             });
-            (touch.target || container).dispatchEvent(e);
-          }
-          container.addEventListener("touchstart", function(e) {
-            if (e.touches.length === 1) {
-              dragging = true;
-              lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
-              mouseEvent("mousedown", e.touches[0]);
-            }
-          }, {passive: true});
-          container.addEventListener("touchmove", function(e) {
-            if (dragging && e.touches.length === 1) {
-              e.preventDefault();
-              mouseEvent("mousemove", e.touches[0]);
-            }
+          });
+          obs.observe(c, {childList: true, subtree: true});
+          c.querySelectorAll("canvas").forEach(function(cv) { cv.style.touchAction = "none"; });
+          // Prevent iOS double-tap zoom and scroll interference
+          var lastTouch = 0;
+          document.addEventListener("touchend", function(e) {
+            var now = Date.now();
+            if (now - lastTouch < 300) e.preventDefault();
+            lastTouch = now;
           }, {passive: false});
-          function end(e) {
-            if (dragging) { dragging = false; mouseEvent("mouseup", (e.changedTouches||[])[0]||{}); }
-          }
-          container.addEventListener("touchend", end, {passive: true});
-          container.addEventListener("touchcancel", end, {passive: true});
+          document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, {passive: false});
         }
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", attach);
-        } else { attach(); }
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fix);
+        else fix();
       })();
     </script>
     <script type="module" crossorigin src="./assets/index-BeuvGpZ2.js"></script>
