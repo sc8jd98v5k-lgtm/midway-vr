@@ -1,0 +1,16 @@
+<div id="WalletHudRoot" style="width: 84; background-color: #171226; border-color: #06d6a0; border-width: 1; border-radius: 4; padding-top: 5; padding-right: 7; padding-bottom: 5; padding-left: 7; display: flex; flex-direction: column; align-items: center; gap: 2;">
+  <style>
+    .title { font-size: 4.2; font-weight: 700; color: #ff4fa3; text-align: center; }
+    .tickets { font-size: 5; font-weight: 700; color: #ffd166; text-align: center; }
+    .meta { font-size: 3; font-weight: 700; color: #06d6a0; text-align: center; }
+    .notice { font-size: 3.2; font-weight: 700; color: #ffffff; text-align: center; }
+    .row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6; }
+  </style>
+  <div id="WalletTitle" class="title">MIDWAY</div>
+  <div id="WalletTickets" class="tickets">0 TICKETS</div>
+  <div class="row">
+    <div id="WalletLevel" class="meta">CARNIVAL LV 1</div>
+    <div id="WalletStreak" class="meta">STREAK 0D</div>
+  </div>
+  <div id="WalletNotice" class="notice"></div>
+</div>
