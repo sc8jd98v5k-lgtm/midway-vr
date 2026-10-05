@@ -1,0 +1,617 @@
+eScopedIntersection(e){const t=this.scene,n=t.interactableDescendants;t.interactableDescendants=e;try{return this.pointer.computeIntersection("pointer",this.scene,this.nativeEvent)}finally{t.interactableDescendants=n}}ensurePointerEnabled(){this.pointer.getEnabled()||this.pointer.setEnabled(!0,this.nativeEvent,!1)}setRayWorldPose(e,t){this.xrOrigin.updateWorldMatrix(!0,!1),this.gazeRaySpace.position.copy(e),this.xrOrigin.worldToLocal(this.gazeRaySpace.position),this.xrOrigin.getWorldQuaternion(this.tmpQuat).invert(),this.gazeRaySpace.quaternion.copy(this.tmpQuat).multiply(t),this.gazeRaySpace.updateMatrix(),this.gazeRaySpace.updateMatrixWorld(!0)}setRayFromDirection(e,t,n){this.rayTarget.copy(e).add(t),this.rayUp.set(0,1,0).applyQuaternion(n),this.lookMatrix.lookAt(e,this.rayTarget,this.rayUp),this.worldRayQuaternion.setFromRotationMatrix(this.lookMatrix),this.setRayWorldPose(e,this.worldRayQuaternion)}releaseAndDisable(){this.releaseSelect(!0),this.pointer.getEnabled()&&(this.pointer.exit(this.nativeEvent),this.pointer.setEnabled(!1,this.nativeEvent,!1))}updateReticle(){var e,t;if(!this.showDebugReticle){this.reticle.visible=!1;return}const n=this.pointer.getIntersection();if(!n||n.object.isVoidObject){this.reticle.visible=!1;return}this.reticle.material.color.getHex()!==this.reticleTrackedColor.getHex()&&this.reticle.material.color.copy(this.reticleTrackedColor),this.reticleOffset.copy(n.point),this.xrOrigin.worldToLocal(this.reticleOffset),this.reticle.position.copy(this.reticleOffset);const r=(e=n.normal)!==null&&e!==void 0?e:(t=n.face)===null||t===void 0?void 0:t.normal;r&&(this.normalMatrix.getNormalMatrix(n.object.matrixWorld),this.rayUp.copy(r).applyNormalMatrix(this.normalMatrix).normalize(),this.reticle.quaternion.setFromUnitVectors(gp0,this.rayUp),this.xrOrigin.getWorldQuaternion(this.tmpQuat).invert(),this.reticle.quaternion.premultiply(this.tmpQuat));const o=Math.max(.6,Math.min(2,n.distance));this.reticle.scale.setScalar(o),this.reticle.visible=!0}processSelector(e){const t=e.pinchStart.left?"left":e.pinchStart.right?"right":null;if(!t||!this.currentHit)return;const n=this.currentHit;this.heldByHand=t,this.pointerState.handedness=t,this.heldFollowsHand=!1;let r=n.intersection;if(this.pointerTransformFollowsHand){const o=this.xrOrigin.raySpaces[t];if(o.updateWorldMatrix(!0,!1),o.getWorldPosition(this.handOrigin),o.getWorldQuaternion(this.handQuaternion),this.aimDirection.copy(n.intersection.point).sub(this.handOrigin),this.aimDirection.lengthSq()>1e-12){this.aimDirection.normalize(),this.setRayFromDirection(this.handOrigin,this.aimDirection,this.handQuaternion);const i=this.computeScopedIntersection([n.object]);!i.object.isVoidObject&&i.object===n.intersection.object?(r=i,this.handRelativeRayQuaternion.copy(this.handQuaternion).invert().multiply(i.pointerQuaternion),this.heldFollowsHand=!0):this.setRayWorldPose(n.intersection.pointerPosition,n.intersection.pointerQuaternion)}}this.heldHit={object:n.object,intersection:r,angularDistance:n.angularDistance},this.wasSelecting=!0,this.pointer.setIntersection(r),this.pointer.commit(this.nativeEvent,!1),this.buttonEvent.timeStamp=this.nativeEvent.timeStamp,this.buttonEvent.button=0,this.buttonDown=!0;try{this.pointer.down(this.buttonEvent)}catch{this.releaseSelect(!0)}}driveHeldPointer(){if(!(!this.heldHit||!this.heldByHand)){if(this.pointer.getPointerCapture()){if(this.heldFollowsHand){const e=this.xrOrigin.raySpaces[this.heldByHand];e.updateWorldMatrix(!0,!1),e.getWorldPosition(this.handOrigin),e.getWorldQuaternion(this.handQuaternion),this.worldRayQuaternion.copy(this.handQuaternion).multiply(this.handRelativeRayQuaternion),this.setRayWorldPose(this.handOrigin,this.worldRayQuaternion)}else this.setRayWorldPose(this.heldHit.intersection.pointerPosition,this.heldHit.intersection.pointerQuaternion);this.pointer.move(this.scene,this.nativeEvent);return}this.setRayWorldPose(this.heldHit.intersection.pointerPosition,this.heldHit.intersection.pointerQuaternion),this.pointer.setIntersection(this.heldHit.intersection),this.pointer.commit(this.nativeEvent,!0)}}isHeldTargetAvailable(e){var t;const n=(t=this.heldHit)===null||t===void 0?void 0:t.object;return!!n&&W6(n)&&e.includes(n)}releaseSelect(e=!1){if(this.buttonDown){if(this.buttonEvent.timeStamp=this.nativeEvent.timeStamp,this.buttonEvent.button=0,e){try{this.pointer.cancel(this.nativeEvent)}catch{}const t=this.pointer.getEnabled();t&&this.pointer.setEnabled(!1,this.nativeEvent,!0);try{this.pointer.up(this.buttonEvent)}catch{}t&&this.pointer.setEnabled(!0,this.nativeEvent,!1)}else try{this.pointer.up(this.buttonEvent)}catch{}this.buttonDown=!1}this.heldHit=null,this.heldByHand=null,this.pointerState.handedness=null,this.heldFollowsHand=!1,this.wasSelecting=!1}getCurrentTarget(){var e,t;return(t=(e=this.currentHit)===null||e===void 0?void 0:e.object)!==null&&t!==void 0?t:null}getHeldByHand(){return this.heldByHand}isSelecting(){return this.wasSelecting}getOrigin(){return this.filteredOrigin}getDirection(){return this.direction}getGazeOrigin(){return this.xrOrigin.gazeOrigin}reset(){this.diagnostics.reset(),this.provider.reset(),this.filter.reset(),this.currentHit=null,this.hasAcquiredTrackedGaze=!1,this.gazeSource=null,this.gazeSourcePresent=!1,this.lastTrackedPoseTime=Number.NEGATIVE_INFINITY,this.reticle.visible=!1,this.releaseAndDisable()}dispose(){this.releaseAndDisable(),this.reticle.geometry.dispose(),this.reticle.material.dispose(),this.reticle.removeFromParent(),this.gazeRaySpace.removeFromParent()}}const{lerp:Hl}=c4,g6=512;let no;function wp0(){if(no)return no;const s=document.createElement("canvas");s.width=g6,s.height=g6;const e=s.getContext("2d");return e.clearRect(0,0,s.width,s.height),e.fillStyle="white",e.beginPath(),e.arc(g6/2,g6/2,g6/16*7,0,Math.PI*2),e.fill(),e.strokeStyle="gray",e.lineWidth=3,e.beginPath(),e.arc(g6/2,g6/2,g6/16*7,0,Math.PI*2),e.stroke(),no=new v81(s),no}const Lp0=new y(0,0,1),jl=new y,tn=new y,so=new A0,ro=new y,qm=new N0;let _p0=0;class yp0{constructor(e,t){this.xrOrigin=e,this.focusAlpha=0,this.cursor=new p0(new $8(.008),new R0({map:wp0(),transparent:!0})),this.cursor.renderOrder=1/0,this.cursor.userData.attached=!0,this.cursor.visible=!1,this.zOffset=.004+(t+_p0++)*.001,e.add(this.cursor)}updateFromIntersection(e,t,n){var r,o;tn.copy(e.pointOnFace),this.focusAlpha=Hl(this.focusAlpha,n?1:0,30*t);const i=(Math.max(0,e.distance-.3)+1)*Hl(1,.8,this.focusAlpha);this.cursor.material.opacity=Hl(.7,1,this.focusAlpha),this.cursor.scale.setScalar(i);const a=(r=e.normal)!==null&&r!==void 0?r:(o=e.face)===null||o===void 0?void 0:o.normal;a!=null?(ro.copy(a),qm.getNormalMatrix(e.object.matrixWorld),ro.applyNormalMatrix(qm).normalize(),tn.addScaledVector(ro,this.zOffset),this.cursor.quaternion.setFromUnitVectors(Lp0,ro),this.xrOrigin.getWorldQuaternion(so).invert(),this.cursor.quaternion.premultiply(so)):e.pointerQuaternion&&(jl.set(0,0,this.zOffset),jl.applyQuaternion(e.pointerQuaternion),tn.add(jl),this.cursor.quaternion.copy(e.pointerQuaternion),this.xrOrigin.getWorldQuaternion(so).invert(),this.cursor.quaternion.premultiply(so)),this.xrOrigin.worldToLocal(tn),this.cursor.position.copy(tn),this.cursor.updateMatrix()}setVisible(e){this.cursor.visible=e}dispose(){this.cursor.geometry.dispose(),this.cursor.material.dispose(),this.cursor.removeFromParent()}}class bp0{constructor(e,t,n){this.pointer=gh0(()=>e,{current:t.gripSpaces[n]},{},{filter:W6})}update(e,t,n,r,o){}}const{lerp:kp0}=c4,Ip0=`
+  varying float vPosition;
+  void main() {
+    vPosition = (position.z + 1.0) / 1.0;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`,Mp0=`
+  uniform float endValue;
+  uniform float opacity;
+  uniform vec3 color;
+  varying float vPosition;
+  void main() {
+    float alpha = vPosition < endValue ? smoothstep(endValue-0.05, endValue, vPosition) :
+               vPosition < 0.97 ? 1.0 :
+               1.0 - smoothstep(0.97, 1.0, vPosition);
+    gl_FragColor = vec4(color, alpha * opacity);
+  }
+`,Ep0=new l0(3376102),Wm=new l0(16777215);var zn;(function(s){s[s.Visible=1]="Visible",s[s.VisibleOnIntersection=2]="VisibleOnIntersection",s[s.Invisible=3]="Invisible"})(zn||(zn={}));class Bp0{constructor(e,t,n){this.enabled=!0,this.rayDisplayMode=zn.VisibleOnIntersection,this.pointer=V01(()=>e,{current:t.raySpaces[n]},{},{filter:W6,clickThresholdMs:800,contextMenuButton:-1});const r=this.pointer.intersector.raycaster;r&&(r.firstHitOnly=!0),this.ray=new p0(new T0(.001,.001,1,6,1,!0).translate(0,.5,0).rotateX(-Math.PI/2),new $9({vertexShader:Ip0,fragmentShader:Mp0,transparent:!0,depthWrite:!1,uniforms:{endValue:{value:.75},color:{value:new l0().copy(Wm)},opacity:{value:0}}})),this.ray.visible=!1,this.ray.renderOrder=0,t.raySpaces[n].add(this.ray)}update(e,t,n,r,o,i){const a=this.pointer.getEnabled(),C=a&&e&&this.enabled;this.ray.visible=C&&!i?.forceHideRay,C&&(a&&r?this.ray.material.uniforms.color.value.copy(Ep0):a&&o&&this.ray.material.uniforms.color.value.copy(Wm)),this.updatePointerRendering(C,t)}updatePointerRendering(e,t=1){let n=0;if(e){const r=this.pointer.getIntersection(),o=!!(r&&!r.object.isVoidObject);switch(this.rayIntersection=o?r:void 0,this.rayDisplayMode){case zn.Visible:n=1;break;case zn.Invisible:n=0;break;default:n=o?1:0}o&&(this.ray.material.uniforms.endValue.value=1.05-Math.min(.3,r.distance))}else this.rayIntersection=void 0;this.ray.material.uniforms.opacity.value=kp0(this.ray.material.uniforms.opacity.value,n,t*10)}get busy(){return!!this.rayIntersection}dispose(){this.ray.geometry.dispose(),this.ray.material.dispose(),this.ray.removeFromParent()}}const $l={hoverRadius:.2,downRadius:.02,clickThresholdMs:800};class Np0{constructor(e,t,n){this.pointer=mh0(()=>e,{current:t.indexTipSpaces[n]},{},{filter:W6,hoverRadius:$l.hoverRadius,downRadius:$l.downRadius,clickThresholdMs:$l.clickThresholdMs,button:0})}update(e,t,n,r,o){}}var t2;(function(s){s.DISABLED="disabled",s.NORMAL="normal",s.HOVER="hover",s.SELECT="select"})(t2||(t2={}));const Jm=["touch","grab","ray"],Km={enterHoverDistance:.15,exitHoverDistance:.2},Sp0=1e-6;class Ym{constructor(e,t,n,r){this.handedness=e,this.scene=t,this.camera=n,this.xrOrigin=r,this.activeKind=null,this.pointerStates=new Map,this.touchHoverActive=!1,this.nativeEvent={timeStamp:0},this.rayPolicy={forceHideRay:!1},this.movedPointers=new Set,this.buttonEvent={timeStamp:0,button:0};const o=new Bp0(this.camera,this.xrOrigin,this.handedness),i=new bp0(this.camera,this.xrOrigin,this.handedness),a=new Np0(this.camera,this.xrOrigin,this.handedness);this.ray={pointer:o.pointer,visual:o,registered:!1},this.grab={pointer:i.pointer,visual:i,registered:!1},this.touch={pointer:a.pointer,visual:a,registered:!1},this.sceneWithDescendants=this.scene,this.cursorVisual=new yp0(r,e==="left"?0:1),Jm.forEach(C=>{this.pointerStates.set(C,t2.DISABLED)}),this.toggleSubPointer("ray",!0),this.toggleSubPointer("touch",!0)}update(e,t,n,r){var o,i,a,C,l,d;this.nativeEvent.timeStamp=n*1e3;const c=e&&!r?.suppressRay;this.updatePointerEnabled(e,c);const u=this.getActivePointer();(u?this.pointerStates.get(this.activeKind):null)===t2.SELECT?u&&this.activeKind&&this.movePointerWithDescendants(this.activeKind,u):(this.computeAllIntersections(),this.pickActiveByPriority()),this.processLifecycle(r);const v=!!(!((i=(o=this.ray.pointer).getPointerCapture)===null||i===void 0)&&i.call(o))||!!(!((C=(a=this.grab.pointer).getPointerCapture)===null||C===void 0)&&C.call(a))||!!(!((d=(l=this.touch.pointer).getPointerCapture)===null||d===void 0)&&d.call(l));if(this.activeKind&&!v){const m=this.getEntry(this.activeKind).pointer.getIntersection(),w=this.pointerStates.get(this.activeKind)===t2.SELECT,x=!!m&&!m.object.isVoidObject;this.cursorVisual.setVisible(x),x&&m&&this.cursorVisual.updateFromIntersection(m,t,w)}else this.cursorVisual.setVisible(!1);this.rayPolicy.forceHideRay=this.shouldHideRay(),this.ray.visual.update(c&&this.ray.registered,t,n,!!r?.selectStart,!!r?.selectEnd,this.rayPolicy),this.grab.visual.update(e&&this.grab.registered,t,n,!!r?.squeezeStart,!!r?.squeezeEnd),this.touch.visual.update(e&&this.touch.registered,t,n,!1,!1)}updatePointerEnabled(e,t){this.updateSinglePointerEnabled("ray",this.ray,t),this.updateSinglePointerEnabled("grab",this.grab,e),this.updateSinglePointerEnabled("touch",this.touch,e)}updateSinglePointerEnabled(e,t,n){const r=n&&t.registered,i=this.pointerStates.get(e)!==t2.DISABLED;if(r&&!i)t.pointer.setEnabled(!0,this.nativeEvent,!1),this.pointerStates.set(e,t2.NORMAL);else if(!r){if(t.pointer.getEnabled()){const a=[...t.pointer.getButtonsDown()];a.length>0&&(this.movedPointers.has(e)||(t.pointer.commit(this.nativeEvent,!1),this.movedPointers.add(e)),t.pointer.cancel(this.nativeEvent)),t.pointer.setEnabled(!1,this.nativeEvent,!0);for(const C of a)t.pointer.up({button:C,timeStamp:this.nativeEvent.timeStamp})}this.pointerStates.set(e,t2.DISABLED),this.activeKind===e&&(this.activeKind=null)}}computeAllIntersections(){const e=this.sceneWithDescendants.interactableDescendants;this.pointerStates.get("ray")!==t2.DISABLED&&(this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.rayDescendants,this.ray.pointer.move(this.scene,this.nativeEvent),this.markPointerMoved("ray",this.ray.pointer)),this.pointerStates.get("grab")!==t2.DISABLED&&(this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.grabDescendants,this.grab.pointer.move(this.scene,this.nativeEvent),this.markPointerMoved("grab",this.grab.pointer)),this.pointerStates.get("touch")!==t2.DISABLED&&(this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.touchDescendants,this.touch.pointer.move(this.scene,this.nativeEvent),this.markPointerMoved("touch",this.touch.pointer)),this.sceneWithDescendants.interactableDescendants=e}movePointerWithDescendants(e,t){const n=this.sceneWithDescendants.interactableDescendants;switch(e){case"ray":this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.rayDescendants;break;case"grab":this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.grabDescendants;break;case"touch":this.sceneWithDescendants.interactableDescendants=this.sceneWithDescendants.touchDescendants;break}t.move(this.scene,this.nativeEvent),this.markPointerMoved(e,t),this.sceneWithDescendants.interactableDescendants=n}markPointerMoved(e,t){t.intersector.isReady()&&this.movedPointers.add(e)}pickActiveByPriority(){let e=null;for(const t of Jm)if(this.pointerStates.get(t)!==t2.DISABLED&&this.hasValidCandidate(t)){e=t;break}e!==this.activeKind&&this.switchActivePointer(e)}hasValidCandidate(e){const n=this.getEntry(e).pointer.getIntersection();if(!n||n.object.isVoidObject)return e==="touch"&&(this.touchHoverActive=!1),!1;if(e==="touch"){const r=this.touchHoverActive?Km.exitHoverDistance:Km.enterHoverDistance;return n.distance>r?(this.touchHoverActive&&(this.touchHoverActive=!1),!1):(this.touchHoverActive=!0,!0)}return!0}switchActivePointer(e){this.activeKind&&this.activeKind!==e&&this.pointerStates.get(this.activeKind)===t2.HOVER&&this.pointerStates.set(this.activeKind,t2.NORMAL),this.activeKind=e,e&&this.pointerStates.get(e)===t2.NORMAL&&this.pointerStates.set(e,t2.HOVER)}processLifecycle(e){if(!this.activeKind)return;const t=this.getEntry(this.activeKind),n=this.pointerStates.get(this.activeKind);switch(this.activeKind){case"touch":this.processTouchLifecycle(t,n);break;case"grab":this.processButtonLifecycle(t,n,!!e?.squeezeStart,!!e?.squeezeEnd,2);break;case"ray":this.processButtonLifecycle(t,n,!!e?.selectStart,!!e?.selectEnd,0);break}}processTouchLifecycle(e,t){const n=e.pointer.getIntersection();if(!n||n.object.isVoidObject){t===t2.SELECT&&(this.buttonEvent.timeStamp=this.nativeEvent.timeStamp,this.buttonEvent.button=0,e.pointer.up(this.buttonEvent)),(t===t2.HOVER||t===t2.SELECT)&&this.pointerStates.set("touch",t2.NORMAL);return}const r=e.pointer.getButtonsDown().size>0;t===t2.HOVER&&r?this.pointerStates.set("touch",t2.SELECT):t===t2.SELECT&&!r?this.pointerStates.set("touch",t2.HOVER):t===t2.NORMAL&&this.pointerStates.set("touch",t2.HOVER)}processButtonLifecycle(e,t,n,r,o){const i=e.pointer.getIntersection();if(!i||i.object.isVoidObject){t===t2.HOVER&&this.pointerStates.set(this.activeKind,t2.NORMAL);return}t===t2.HOVER&&n?(this.buttonEvent.timeStamp=this.nativeEvent.timeStamp,this.buttonEvent.button=o,e.pointer.down(this.buttonEvent),this.pointerStates.set(this.activeKind,t2.SELECT)):t===t2.SELECT&&r?(this.buttonEvent.timeStamp=this.nativeEvent.timeStamp,this.buttonEvent.button=o,e.pointer.up(this.buttonEvent),this.pointerStates.set(this.activeKind,t2.HOVER)):t===t2.NORMAL&&this.pointerStates.set(this.activeKind,t2.HOVER)}getPolicyForRay(){return{forceHideRay:this.shouldHideRay()}}shouldHideRay(){return this.pointerStates.get("ray")===t2.DISABLED||this.activeKind!=="ray"&&this.activeKind!==null}getRayBusy(){return!!this.ray.visual.busy}toggleSubPointer(e,t){const n=this.getEntry(e);return n.registered===t?!1:(n.registered=t,t||(this.pointerStates.set(e,t2.DISABLED),this.activeKind===e&&(this.activeKind=null),e==="touch"&&(this.touchHoverActive=!1)),!0)}getSubPointerState(e){return{registered:this.getEntry(e).registered}}getActiveKind(){return this.activeKind}getTouchSurfaceVisualOffset(e=new y){if(this.activeKind!=="touch"||this.pointerStates.get("touch")!==t2.SELECT)return null;const t=this.touch.pointer.getIntersection();return!t||t.object.isVoidObject||t.details.type!=="sphere"||(e.copy(t.pointOnFace).sub(t.pointerPosition),e.lengthSq()<Sp0)?null:e}getActivePointer(){return this.activeKind?this.getEntry(this.activeKind).pointer:null}getPointer(e){return this.getEntry(e).pointer}routeDown(e,t,n){const r=this.pickTarget(t);if(!r)return;const o=e==="select"?0:2;r.down({button:o,timeStamp:n.timeStamp})}routeUp(e,t,n){const r=this.pickTarget(t);if(!r)return;const o=e==="select"?0:2;r.up({button:o,timeStamp:n.timeStamp})}pickTarget(e){var t,n,r,o,i,a;return e==="active"?!((n=(t=this.ray.pointer).getPointerCapture)===null||n===void 0)&&n.call(t)?this.ray.pointer:!((o=(r=this.grab.pointer).getPointerCapture)===null||o===void 0)&&o.call(r)?this.grab.pointer:!((a=(i=this.touch.pointer).getPointerCapture)===null||a===void 0)&&a.call(i)?this.touch.pointer:this.activeKind?this.getEntry(this.activeKind).pointer:this.ray.pointer:e==="ray"?this.ray.pointer:this.grab.pointer}getEntry(e){switch(e){case"ray":return this.ray;case"grab":return this.grab;case"touch":return this.touch}}dispose(){this.cursorVisual.dispose(),this.ray.visual.dispose(),this.pointerStates.clear(),this.activeKind=null}}const Qp0=4;var Xm;(function(s){s.Controller="controller",s.Hand="hand"})(Xm||(Xm={}));const Ln={gltfLoader:new I11,async loadGLTF(s){return await Ln.gltfLoader.loadAsync(s)}};class Sv0{get gazeEnabled(){return this.gazeEnabledFlag}set gazeEnabled(e){e!==this.gazeEnabledFlag&&(this.gazeEnabledFlag=e,this.resetGazeHandSelectionArming(),e||(this.gazePointer.reset(),this.xrOrigin.clearGaze()),this.gazePointer.setAttached(e))}constructor(e){this.gazeEnabledFlag=!1,this.gazeCandidates=[],this.gazeInput={candidates:[],pinchStart:{left:!1,right:!1},pinchEnd:{left:!1,right:!1},pinchActive:{left:!1,right:!1},directPointerActive:{left:!1,right:!1}},this.gamepads={left:void 0,right:void 0},this.activeInputSources={hand:{left:void 0,right:void 0},controller:{left:void 0,right:void 0}},this.primaryInputSources={left:void 0,right:void 0},this.hadSession=!1,this.touchSurfaceVisualOffsets={left:new y,right:new y},this.processedInputSourceKeys=new Set,this.handSelectEvents={left:{inputSource:void 0,actualActive:!1,reportedActive:!1,transitions:[]},right:{inputSource:void 0,actualActive:!1,reportedActive:!1,transitions:[]}},this.handSelectFrameState={left:{start:!1,end:!1,active:!1},right:{start:!1,end:!1,active:!1}},this.gazeHandSelectionArmed={left:!1,right:!1},this.pointerDisableWarnings=new Set,this.selectStartHandler=o=>{this.updateHandSelectEvent(o,!0)},this.selectEndHandler=o=>{this.updateHandSelectEvent(o,!1)};const{scene:t,camera:n,assetLoader:r}=e;this.xrOrigin=new Cp0,this.scene=t,this.visualAdapters={controller:{left:new zm(this.xrOrigin,"left",!0,Ct,t,n,r||Ln),right:new zm(this.xrOrigin,"right",!0,Ct,t,n,r||Ln)},hand:{left:new Hm(this.xrOrigin,"left",!0,Di,t,n,r||Ln),right:new Hm(this.xrOrigin,"right",!0,Di,t,n,r||Ln)},left:b0(void 0),right:b0(void 0)},this.multiPointers={left:new Ym("left",this.scene,n,this.xrOrigin),right:new Ym("right",this.scene,n,this.xrOrigin)},this.gazePointer=new xp0(this.xrOrigin,this.scene,n)}update(e,t,n){const r=e.getSession();if(!r){this.syncSelectEventSession(void 0),this.hadSession?this.onSessionEnded():this.disablePointers(n),this.hadSession=!1;return}this.hadSession=!0,this.syncSelectEventSession(r);const o=e.getReferenceSpace(),i=e.getFrame();if(!o||!i){this.disablePointers(n);return}this.resetActiveInputSources(),this.updateActiveInputSources(r),this.updateControllersAndHands(i,o,t),this.updateHandSelectFrameState(),this.xrOrigin.updateHead(i,o),this.gazeEnabled&&this.gazePointer.sampleGazePose(n,{frame:i,referenceSpace:o,session:r}),this.xrOrigin.updateMatrixWorld(!0),this.updatePointers(t,n),this.updateGazePointer(t,n)}onSessionEnded(){this.resetActiveInputSources(),["left","right"].forEach(e=>{const t=this.visualAdapters.controller[e],n=this.visualAdapters.hand[e];t.connected&&t.disconnect(),n.connected&&n.disconnect()}),this.visualAdapters.left.value=void 0,this.visualAdapters.right.value=void 0,this.xrOrigin.clearGaze(),this.gazePointer.reset(),this.disablePointers()}disablePointers(e=0){this.resetHandSelectEvents(),this.resetHandSelectFrameState(),this.resetGazeHandSelectionArming();for(const t of["left","right"])try{this.multiPointers[t].update(!1,0,e),this.pointerDisableWarnings.delete(t)}catch(n){this.warnPointerDisableFailure(t,n)}try{this.gazeInput.candidates=[];for(const t of["left","right"])this.gazeInput.pinchStart[t]=!1,this.gazeInput.pinchEnd[t]=!1,this.gazeInput.pinchActive[t]=!1,this.gazeInput.directPointerActive[t]=!1;this.gazePointer.update(!1,0,e,this.gazeInput),this.pointerDisableWarnings.delete("gaze")}catch(t){this.warnPointerDisableFailure("gaze",t)}}warnPointerDisableFailure(e,t){this.pointerDisableWarnings.has(e)||(this.pointerDisableWarnings.add(e),console.warn(`[IWSDK] Failed to disable ${e} pointer:`,t))}isPrimary(e,t){var n;return!!(!((n=this.activeInputSources[e][t])===null||n===void 0)&&n.isPrimary)}getPrimaryInputSource(e){return this.primaryInputSources[e]}resetActiveInputSources(){this.activeInputSources.controller.left=void 0,this.activeInputSources.controller.right=void 0,this.activeInputSources.hand.left=void 0,this.activeInputSources.hand.right=void 0,this.primaryInputSources.left=void 0,this.primaryInputSources.right=void 0}syncSelectEventSession(e){this.selectEventSession!==e&&(this.selectEventSession&&(this.selectEventSession.removeEventListener("selectstart",this.selectStartHandler),this.selectEventSession.removeEventListener("selectend",this.selectEndHandler)),this.resetHandSelectEvents(),this.resetHandSelectFrameState(),this.resetGazeHandSelectionArming(),this.selectEventSession=e,e&&(e.addEventListener("selectstart",this.selectStartHandler),e.addEventListener("selectend",this.selectEndHandler)))}updateHandSelectEvent(e,t){const n=e.inputSource,r=n.handedness;if(!n.hand||r!=="left"&&r!=="right")return;const o=this.handSelectEvents[r];o.inputSource!==n&&(o.inputSource=n,o.actualActive=!1,o.reportedActive=!1,o.transitions.length=0),o.actualActive!==t&&(o.actualActive=t,o.transitions.length>=Qp0&&o.transitions.splice(0,2),o.transitions.push(t?"start":"end"))}resetHandSelectEvents(e){const t=e?[e]:["left","right"];for(const n of t){const r=this.handSelectEvents[n];r.inputSource=void 0,r.actualActive=!1,r.reportedActive=!1,r.transitions.length=0}}resetHandSelectFrameState(){for(const e of["left","right"]){const t=this.handSelectFrameState[e];t.start=!1,t.end=!1,t.active=!1}}resetGazeHandSelectionArming(){this.gazeHandSelectionArmed.left=!1,this.gazeHandSelectionArmed.right=!1}updateHandSelectFrameState(){for(const e of["left","right"]){const t=this.readHandSelectState(e),n=this.handSelectFrameState[e];n.start=t.start,n.end=t.end,n.active=t.active}}readHandSelectState(e){const t=this.gamepads[e];if(t)return this.resetHandSelectEvents(e),{start:t.getSelectStart(),end:t.getSelectEnd(),active:t.getSelecting()};const n=this.primaryInputSources[e],r=this.handSelectEvents[e];if(!!!(n?.hand&&r.inputSource===n))return this.resetHandSelectEvents(e),{start:!1,end:!1,active:!1};const i=r.transitions.shift();return i==="start"?r.reportedActive=!0:i==="end"&&(r.reportedActive=!1),{start:i==="start",end:i==="end",active:r.reportedActive}}updateActiveInputSources(e){this.processedInputSourceKeys.clear();for(const t of e.inputSources){this.assignInputSource(t,!0);const n=`${t.handedness}-${t.hand?"hand":"controller"}`;this.processedInputSourceKeys.add(n)}if(e.trackedSources)for(const t of e.trackedSources){const n=`${t.handedness}-${t.hand?"hand":"controller"}`;this.processedInputSourceKeys.has(n)||this.assignInputSource(t,!1)}}assignInputSource(e,t){const n=e.handedness;if(n==="left"||n==="right"){const r=e.hand?this.activeInputSources.hand:this.activeInputSources.controller;r[n]={inputSource:e,isPrimary:t},t&&(this.primaryInputSources[n]=e)}}updateControllersAndHands(e,t,n){["left","right"].forEach(r=>{if(["controller","hand"].forEach(i=>{const a=this.activeInputSources[i][r],C=this.visualAdapters[i][r];if(a){const{inputSource:l,isPrimary:d}=a,c=d?this.xrOrigin.raySpaces[r]:this.xrOrigin.secondaryRaySpaces[r],u=d?this.xrOrigin.gripSpaces[r]:this.xrOrigin.secondaryGripSpaces[r];if(C.raySpace=c,C.gripSpace=u,Vl(e,l.targetRaySpace,t,c),l.gripSpace?Vl(e,l.gripSpace,t,u):(u.position.copy(c.position),u.quaternion.copy(c.quaternion),u.scale.copy(c.scale)),C.inputSource!==a.inputSource&&C.connect(a.inputSource),C.update(e,n),C.isPrimary=a.isPrimary,C.isPrimary&&(this.visualAdapters[r].value=C),C.visual&&(C.visual.model.visible=a.isPrimary),i==="hand"&&d){const A=this.visualAdapters.hand[r].getIndexTipSpace();A&&Vl(e,A,t,this.xrOrigin.indexTipSpaces[r])}}else C.connected&&C.disconnect()}),!!!this.activeInputSources.hand[r]&&this.activeInputSources.controller[r]){const i=this.xrOrigin.raySpaces[r],a=this.xrOrigin.indexTipSpaces[r];a.position.copy(i.position),a.quaternion.copy(i.quaternion),a.scale.copy(i.scale)}}),["left","right"].forEach(r=>{var o,i;const a=this.primaryInputSources[r];((o=this.gamepads[r])===null||o===void 0?void 0:o.inputSource)!==a&&(this.gamepads[r]=void 0);const C=!!(a&&a.gamepad);if(!this.gamepads[r]&&C){const l=Y01(a);this.gamepads[r]=new Vh0(l)}C&&((i=this.gamepads[r])===null||i===void 0||i.update())})}updatePointers(e,t){const n=this.gazeEnabled&&this.gazePointer.ownsFarTargeting(t);["left","right"].forEach(r=>{const o=this.primaryInputSources[r],i=this.gamepads[r],a=!!(o&&(i||o.hand)),C=this.handSelectFrameState[r],l=a?C.start:!1,d=a?C.end:!1,c=a?!!i?.getButtonDown("xr-standard-squeeze"):!1,u=a?!!i?.getButtonUp("xr-standard-squeeze"):!1;this.multiPointers[r].update(a,e,t,{selectStart:l,selectEnd:d,squeezeStart:c,squeezeEnd:u,suppressRay:n});const p=this.multiPointers[r].getTouchSurfaceVisualOffset(this.touchSurfaceVisualOffsets[r]),A=this.visualAdapters.hand[r];p&&A.isPrimary&&A.applyVisualOffsetWorld(p)})}updateGazePointer(e,t){if(!this.gazeEnabled)return;const n=this.gazeInput;n.candidates=this.gazeCandidates,["left","right"].forEach(r=>{const o=this.handSelectFrameState[r];if(this.gazeHandSelectionArmed[r])n.pinchStart[r]=o.start,n.pinchEnd[r]=o.end,n.pinchActive[r]=o.active;else{const a=this.handSelectEvents[r];!o.active&&a.transitions.length===0&&(this.gazeHandSelectionArmed[r]=!0),n.pinchStart[r]=!1,n.pinchEnd[r]=!1,n.pinchActive[r]=!1}const i=this.multiPointers[r].getActiveKind();n.directPointerActive[r]=i==="touch"||i==="grab"}),this.gazePointer.update(this.gazePointer.canTarget(),e,t,n)}}function Vl(s,e,t,n){const r=s.getPose(e,t);r&&(n.matrix.fromArray(r.transform.matrix),n.matrix.decompose(n.position,n.quaternion,n.scale))}var s9;(function(s){s.South="standard-south",s.East="standard-east",s.West="standard-west",s.North="standard-north",s.LeftBumper="standard-left-bumper",s.RightBumper="standard-right-bumper",s.LeftTrigger="standard-left-trigger",s.RightTrigger="standard-right-trigger",s.Select="standard-select",s.Start="standard-start",s.LeftStick="standard-left-stick",s.RightStick="standard-right-stick",s.DPadUp="standard-dpad-up",s.DPadDown="standard-dpad-down",s.DPadLeft="standard-dpad-left",s.DPadRight="standard-dpad-right",s.Home="standard-home"})(s9||(s9={}));var lt;(function(s){s.LeftStick="standard-left-stick-axes",s.RightStick="standard-right-stick-axes"})(lt||(lt={}));const Pp0={selectComponentId:s9.South,components:{[s9.South]:{type:"button",gamepadIndices:{button:0}},[s9.East]:{type:"button",gamepadIndices:{button:1}},[s9.West]:{type:"button",gamepadIndices:{button:2}},[s9.North]:{type:"button",gamepadIndices:{button:3}},[s9.LeftBumper]:{type:"button",gamepadIndices:{button:4}},[s9.RightBumper]:{type:"button",gamepadIndices:{button:5}},[s9.LeftTrigger]:{type:"trigger",gamepadIndices:{button:6}},[s9.RightTrigger]:{type:"trigger",gamepadIndices:{button:7}},[s9.Select]:{type:"button",gamepadIndices:{button:8}},[s9.Start]:{type:"button",gamepadIndices:{button:9}},[s9.LeftStick]:{type:"button",gamepadIndices:{button:10}},[s9.RightStick]:{type:"button",gamepadIndices:{button:11}},[s9.DPadUp]:{type:"button",gamepadIndices:{button:12}},[s9.DPadDown]:{type:"button",gamepadIndices:{button:13}},[s9.DPadLeft]:{type:"button",gamepadIndices:{button:14}},[s9.DPadRight]:{type:"button",gamepadIndices:{button:15}},[s9.Home]:{type:"button",gamepadIndices:{button:16}},[lt.LeftStick]:{type:"thumbstick",gamepadIndices:{xAxis:0,yAxis:1}},[lt.RightStick]:{type:"thumbstick",gamepadIndices:{xAxis:2,yAxis:3}}}};class Qv0 extends J01{constructor(e){super(Pp0,e.buttons.length),this.gamepad=e}get index(){return this.gamepad.index}get id(){return this.gamepad.id}get connected(){return this.gamepad.connected}get mapping(){return this.gamepad.mapping}refresh(e=this.gamepad){this.gamepad=e,super.update(e.buttons,e.axes)}}const X9={LocomotionMove:"locomotion.move",LocomotionTurn:"locomotion.turn",LocomotionJump:"locomotion.jump",LocomotionTeleportAim:"locomotion.teleportAim"},Zm=.8;function ql(s,e=-1,t=1){return Math.min(t,Math.max(e,s))}function oo(s,e){return!!e?.some(t=>s.getKeyPressed(t))}class Pv0{constructor(){this.bindings=[],this.buttonStates=new Map,this.axis1DStates=new Map,this.axis2DStates=new Map,this.enableDefaultBindings("xr")}enableDefaultBindings(e,t={}){const n=this.createDefaultBindings(e,t);for(const r of n)this.bindings.some(o=>ev(o,r))||this.bindings.push(r)}clearBindings(e){if(!e){this.bindings.length=0;return}for(let t=this.bindings.length-1;t>=0;t--)this.bindings[t].action===e&&this.bindings.splice(t,1)}addBinding(e){this.bindings.push(e)}addBindings(e){this.bindings.push(...e)}removeBinding(e){const t=this.bindings.findIndex(n=>ev(n,e));return t===-1?!1:(this.bindings.splice(t,1),!0)}getBindings(e){return this.bindings.filter(t=>!e||t.action===e).map(Rp0)}update(e){this.prepareFrame();for(const t of this.bindings)t.kind==="axis2d"?this.applyAxis2DBinding(e,t):t.kind==="axis1d"?this.applyAxis1DBinding(e,t):this.applyButtonBinding(e,t);for(const t of this.axis1DStates.values())t.current=ql(t.current);for(const t of this.axis2DStates.values())t.x=ql(t.x),t.y=ql(t.y)}getButtonPressed(e){var t,n;return(n=(t=this.buttonStates.get(e))===null||t===void 0?void 0:t.pressed)!==null&&n!==void 0?n:!1}getButtonDown(e){var t,n;return(n=(t=this.buttonStates.get(e))===null||t===void 0?void 0:t.down)!==null&&n!==void 0?n:!1}getButtonUp(e){var t,n;return(n=(t=this.buttonStates.get(e))===null||t===void 0?void 0:t.up)!==null&&n!==void 0?n:!1}getAxis1D(e){var t,n;return(n=(t=this.axis1DStates.get(e))===null||t===void 0?void 0:t.current)!==null&&n!==void 0?n:0}getAxis1DEnteringPositive(e,t=Zm){const n=this.axis1DStates.get(e);return!!n&&n.current>=t&&n.previous<t}getAxis1DEnteringNegative(e,t=Zm){const n=this.axis1DStates.get(e);return!!n&&n.current<=-t&&n.previous>-t}getAxis2D(e,t={x:0,y:0}){var n,r;const o=this.axis2DStates.get(e);return t.x=(n=o?.x)!==null&&n!==void 0?n:0,t.y=(r=o?.y)!==null&&r!==void 0?r:0,t}prepareFrame(){for(const e of this.buttonStates.values())e.down=!1,e.up=!1,e.pressed=!1;for(const e of this.axis1DStates.values())e.previous=e.current,e.current=0;for(const e of this.axis2DStates.values())e.previousX=e.x,e.previousY=e.y,e.x=0,e.y=0}applyAxis2DBinding(e,t){const n=this.getAxis2DState(t.action);if(t.source==="keyboard"){n.x+=oo(e.keyboard,t.positiveX)?1:0,n.x-=oo(e.keyboard,t.negativeX)?1:0,n.y+=oo(e.keyboard,t.positiveY)?1:0,n.y-=oo(e.keyboard,t.negativeY)?1:0;return}const r=this.getAxesValues(e,t);r&&(n.x+=r.x,n.y+=r.y)}applyAxis1DBinding(e,t){const n=this.getAxis1DState(t.action),r=this.getAxesValues(e,t);r&&(n.current+=t.component==="y"?r.y:r.x)}applyButtonBinding(e,t){const n=this.getButtonState(t.action),r=this.getBindingButtonPressed(e,t),o=this.getBindingButtonDown(e,t),i=this.getBindingButtonUp(e,t);n.pressed||(n.pressed=r),n.down||(n.down=o),n.up||(n.up=i)}getAxesValues(e,t){var n;if(t.source==="browserGamepad"){const r=this.getBrowserGamepad(e,t.gamepadIndex);return r?.getAxesValues(t.axis)}if(t.source==="xrGamepad")return(n=e.xr.gamepads[t.handedness])===null||n===void 0?void 0:n.getAxesValues(t.componentId)}getBindingButtonPressed(e,t){var n,r,o,i,a;return t.source==="keyboard"?e.keyboard.getKeyPressed(t.code):t.source==="browserGamepad"?(r=(n=this.getBrowserGamepad(e,t.gamepadIndex))===null||n===void 0?void 0:n.getButtonPressed(t.button))!==null&&r!==void 0?r:!1:t.source==="xrGamepad"?(i=(o=e.xr.gamepads[t.handedness])===null||o===void 0?void 0:o.getButtonPressed(t.button))!==null&&i!==void 0?i:!1:((a=e.xr.gamepads[t.handedness])===null||a===void 0?void 0:a.getAxesState(t.componentId))===t.state}getBindingButtonDown(e,t){var n,r,o,i,a,C;return t.source==="keyboard"?e.keyboard.getKeyDown(t.code):t.source==="browserGamepad"?(r=(n=this.getBrowserGamepad(e,t.gamepadIndex))===null||n===void 0?void 0:n.getButtonDown(t.button))!==null&&r!==void 0?r:!1:t.source==="xrGamepad"?(i=(o=e.xr.gamepads[t.handedness])===null||o===void 0?void 0:o.getButtonDown(t.button))!==null&&i!==void 0?i:!1:(C=(a=e.xr.gamepads[t.handedness])===null||a===void 0?void 0:a.getAxesEnteringState(t.componentId,t.state))!==null&&C!==void 0?C:!1}getBindingButtonUp(e,t){var n,r,o,i,a,C;return t.source==="keyboard"?e.keyboard.getKeyUp(t.code):t.source==="browserGamepad"?(r=(n=this.getBrowserGamepad(e,t.gamepadIndex))===null||n===void 0?void 0:n.getButtonUp(t.button))!==null&&r!==void 0?r:!1:t.source==="xrGamepad"?(i=(o=e.xr.gamepads[t.handedness])===null||o===void 0?void 0:o.getButtonUp(t.button))!==null&&i!==void 0?i:!1:(C=(a=e.xr.gamepads[t.handedness])===null||a===void 0?void 0:a.getAxesLeavingState(t.componentId,t.state))!==null&&C!==void 0?C:!1}getBrowserGamepad(e,t){return t!==void 0?e.browserGamepads[t]:e.browserGamepads.find(n=>n?.connected)}getButtonState(e){let t=this.buttonStates.get(e);return t||(t={pressed:!1,down:!1,up:!1},this.buttonStates.set(e,t)),t}getAxis1DState(e){let t=this.axis1DStates.get(e);return t||(t={previous:0,current:0},this.axis1DStates.set(e,t)),t}getAxis2DState(e){let t=this.axis2DStates.get(e);return t||(t={previousX:0,previousY:0,x:0,y:0},this.axis2DStates.set(e,t)),t}createDefaultBindings(e,t){return e==="browser-first-person"?this.createBrowserFirstPersonBindings(t):[{source:"xrGamepad",kind:"axis2d",action:X9.LocomotionMove,handedness:"left",componentId:P6.Thumbstick},{source:"xrGamepad",kind:"axis1d",action:X9.LocomotionTurn,handedness:"right",componentId:P6.Thumbstick,component:"x"},{source:"xrGamepad",kind:"button",action:X9.LocomotionJump,handedness:"right",button:P6.A_Button},{source:"xrGamepadAxesDirection",kind:"button",action:X9.LocomotionTeleportAim,handedness:"right",componentId:P6.Thumbstick,state:B9.Down}]}createBrowserFirstPersonBindings(e){var t,n;const r=(t=e.keyboard)!==null&&t!==void 0?t:!0,o=(n=e.gamepad)!==null&&n!==void 0?n:!0,i=[];return r&&i.push({source:"keyboard",kind:"axis2d",action:X9.LocomotionMove,negativeX:["KeyA","ArrowLeft"],positiveX:["KeyD","ArrowRight"],negativeY:["KeyW","ArrowUp"],positiveY:["KeyS","ArrowDown"]},{source:"keyboard",kind:"button",action:X9.LocomotionJump,code:"Space"}),o&&i.push({source:"browserGamepad",kind:"axis2d",action:X9.LocomotionMove,axis:lt.LeftStick},{source:"browserGamepad",kind:"axis1d",action:X9.LocomotionTurn,axis:lt.RightStick,component:"x"},{source:"browserGamepad",kind:"button",action:X9.LocomotionJump,button:s9.South}),i}}function Rp0(s){return s.source==="keyboard"&&s.kind==="axis2d"?{...s,negativeX:s.negativeX?[...s.negativeX]:void 0,positiveX:s.positiveX?[...s.positiveX]:void 0,negativeY:s.negativeY?[...s.negativeY]:void 0,positiveY:s.positiveY?[...s.positiveY]:void 0}:{...s}}function ev(s,e){return tv(s)===tv(e)}function tv(s){const e=Object.entries(s).map(([t,n])=>[t,Array.isArray(n)?[...n].sort():n]);return e.sort(([t],[n])=>t.localeCompare(n)),JSON.stringify(e)}const nv=.8;class t21{constructor(e){this.world=e}enableBrowserControls(e){if(!e)return;const t=typeof e=="object"?{keyboard:e.keyboard,gamepad:e.gamepad}:void 0;this.world.input.actions.enableDefaultBindings("browser-first-person",t)}getMoveAxis(e){const t=this.world.input.actions.getAxis2D(X9.LocomotionMove);return e.set(t.x,t.y)}getMovementReferenceQuaternion(e){return this.world.session?this.world.player.head.getWorldQuaternion(e):this.world.camera.getWorldQuaternion(e),e}getJumpDown(){return this.world.input.actions.getButtonDown(X9.LocomotionJump)}getTurnAxis(){return this.world.input.actions.getAxis1D(X9.LocomotionTurn)}getTurnLeftDown(e){var t,n;return this.isHandMicroGestureMode(e)?(n=(t=this.world.input.xr.gamepads.right)===null||t===void 0?void 0:t.getButtonDownByIdx(5))!==null&&n!==void 0?n:!1:this.world.input.actions.getAxis1DEnteringNegative(X9.LocomotionTurn,nv)}getTurnRightDown(e){var t,n;return this.isHandMicroGestureMode(e)?(n=(t=this.world.input.xr.gamepads.right)===null||t===void 0?void 0:t.getButtonDownByIdx(6))!==null&&n!==void 0?n:!1:this.world.input.actions.getAxis1DEnteringPositive(X9.LocomotionTurn,nv)}shouldShowTurnSignals(e){return this.isHandMicroGestureMode(e)}getTeleportActive(e,t){var n,r;return e?!1:this.world.input.xr.isPrimary("hand","right")?t&&!((r=(n=this.world.input.xr.gamepads.right)===null||n===void 0?void 0:n.getButtonDownByIdx(9))!==null&&r!==void 0&&r):this.world.input.actions.getButtonPressed(X9.LocomotionTeleportAim)}getTeleportCommit(e){var t,n;return this.world.input.xr.isPrimary("hand","right")?e&&((n=(t=this.world.input.xr.gamepads.right)===null||t===void 0?void 0:t.getButtonDownByIdx(9))!==null&&n!==void 0?n:!1):this.world.input.actions.getButtonUp(X9.LocomotionTeleportAim)}getTeleportRay(e,t){return this.world.session?(this.world.player.raySpaces.right.getWorldPosition(e),this.world.player.raySpaces.right.getWorldDirection(t),!0):!1}isHandMicroGestureMode(e){return e&&this.world.input.xr.isPrimary("hand","right")}}function Xh(s,e){if(e instanceof t21)return e;throw new Error(`${s} must be registered through LocomotionSystem so locomotion subsystems share one input provider.`)}const{lerp:Op0}=c4,Tp0=`
+	varying vec2 vUv;
+
+	void main() {
+		vUv = uv;
+		vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+		vec4 viewPosition = viewMatrix * modelPosition;
+		vec4 projectedPosition = projectionMatrix * viewPosition;
+
+		gl_Position = projectedPosition;
+	}
+`,Dp0=`
+	uniform vec3 uColor;
+	uniform float uAlpha;
+	varying vec2 vUv;
+
+	void main() {
+		gl_FragColor = vec4(uColor, uAlpha * vUv.y);
+	}
+`,Fp0=(s,e=0)=>{const t=new p0(new T0(s,s*.5,.3,16,1,!0),new $9({vertexShader:Tp0,fragmentShader:Dp0,uniforms:{uColor:{value:new l0(e)},uAlpha:{value:0}},depthTest:!1,side:$2,transparent:!0}));return t.frustumCulled=!1,t.renderOrder=999,t.rotateX(Math.PI/2),t.position.z=-.15,t};class Wl extends L2({},{locomotor:{type:z.Object,default:void 0},inputProvider:{type:z.Object,default:void 0},maxSpeed:{type:z.Float32,default:5},comfortAssist:{type:z.Float32,default:.5},enableJumping:{type:z.Boolean,default:!0}}){constructor(){super(...arguments),this.movementVector=new y,this.movementDirection=new A0,this.input2D=new w1,this.isMoving=!1,this.vignette=Fp0(.3),this.vignetteAlphaTarget=0}init(){this.locomotor=this.config.locomotor.value,this.inputProvider=Xh("SlideSystem",this.config.inputProvider.value),this.camera.add(this.vignette)}destroy(){this.vignette.removeFromParent()}update(e){this.vignetteAlphaTarget=0,this.config.enableJumping.value&&this.inputProvider.getJumpDown()&&this.locomotor.jump(),this.inputProvider.getMoveAxis(this.input2D);{this.movementVector.set(this.input2D.x,0,this.input2D.y);const t=Math.min(this.input2D.length(),1);t>0?(this.inputProvider.getMovementReferenceQuaternion(this.movementDirection),this.movementVector.applyQuaternion(this.movementDirection),this.movementVector.y=0,this.movementVector.normalize().multiplyScalar(t*this.config.maxSpeed.value),this.locomotor.slide(this.movementVector),this.vignetteAlphaTarget=t*this.config.comfortAssist.value):this.isMoving&&(this.movementVector.set(0,0,0),this.locomotor.slide(this.movementVector)),this.isMoving=t>0,this.vignette.material.uniforms.uAlpha.value=Op0(this.vignette.material.uniforms.uAlpha.value,this.vignetteAlphaTarget,e*10)}}}const sv=new r2,io=new y;class n21 extends x41{constructor(){super(),this.isLineSegmentsGeometry=!0,this.type="LineSegmentsGeometry";const e=[-1,2,0,1,2,0,-1,1,0,1,1,0,-1,0,0,1,0,0,-1,-1,0,1,-1,0],t=[-1,2,1,2,-1,1,1,1,-1,-1,1,-1,-1,-2,1,-2],n=[0,2,1,2,3,1,2,4,3,4,5,3,4,6,5,6,7,5];this.setIndex(n),this.setAttribute("position",new O0(e,3)),this.setAttribute("uv",new O0(t,2))}applyMatrix4(e){const t=this.attributes.instanceStart,n=this.attributes.instanceEnd;return t!==void 0&&(t.applyMatrix4(e),n.applyMatrix4(e),t.needsUpdate=!0),this.boundingBox!==null&&this.computeBoundingBox(),this.boundingSphere!==null&&this.computeBoundingSphere(),this}setPositions(e){let t;e instanceof Float32Array?t=e:Array.isArray(e)&&(t=new Float32Array(e));const n=new lc(t,6,1);return this.setAttribute("instanceStart",new he(n,3,0)),this.setAttribute("instanceEnd",new he(n,3,3)),this.instanceCount=this.attributes.instanceStart.count,this.computeBoundingBox(),this.computeBoundingSphere(),this}setColors(e){let t;e instanceof Float32Array?t=e:Array.isArray(e)&&(t=new Float32Array(e));const n=new lc(t,6,1);return this.setAttribute("instanceColorStart",new he(n,3,0)),this.setAttribute("instanceColorEnd",new he(n,3,3)),this}fromWireframeGeometry(e){return this.setPositions(e.attributes.position.array),this}fromEdgesGeometry(e){return this.setPositions(e.attributes.position.array),this}fromMesh(e){return this.fromWireframeGeometry(new X81(e.geometry)),this}fromLineSegments(e){const t=e.geometry;return this.setPositions(t.attributes.position.array),this}computeBoundingBox(){this.boundingBox===null&&(this.boundingBox=new r2);const e=this.attributes.instanceStart,t=this.attributes.instanceEnd;e!==void 0&&t!==void 0&&(this.boundingBox.setFromBufferAttribute(e),sv.setFromBufferAttribute(t),this.boundingBox.union(sv))}computeBoundingSphere(){this.boundingSphere===null&&(this.boundingSphere=new N2),this.boundingBox===null&&this.computeBoundingBox();const e=this.attributes.instanceStart,t=this.attributes.instanceEnd;if(e!==void 0&&t!==void 0){const n=this.boundingSphere.center;this.boundingBox.getCenter(n);let r=0;for(let o=0,i=e.count;o<i;o++)io.fromBufferAttribute(e,o),r=Math.max(r,n.distanceToSquared(io)),io.fromBufferAttribute(t,o),r=Math.max(r,n.distanceToSquared(io));this.boundingSphere.radius=Math.sqrt(r),isNaN(this.boundingSphere.radius)&&console.error("THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.",this)}}toJSON(){}}i0.line={worldUnits:{value:1},linewidth:{value:1},resolution:{value:new w1(1,1)},dashOffset:{value:0},dashScale:{value:1},dashSize:{value:1},gapSize:{value:1}};S9.line={uniforms:As.merge([i0.common,i0.fog,i0.line]),vertexShader:`
+		#include <common>
+		#include <color_pars_vertex>
+		#include <fog_pars_vertex>
+		#include <logdepthbuf_pars_vertex>
+		#include <clipping_planes_pars_vertex>
+
+		uniform float linewidth;
+		uniform vec2 resolution;
+
+		attribute vec3 instanceStart;
+		attribute vec3 instanceEnd;
+
+		attribute vec3 instanceColorStart;
+		attribute vec3 instanceColorEnd;
+
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
+
+		#ifdef USE_DASH
+
+			uniform float dashScale;
+			attribute float instanceDistanceStart;
+			attribute float instanceDistanceEnd;
+			varying float vLineDistance;
+
+		#endif
+
+		void trimSegment( const in vec4 start, inout vec4 end ) {
+
+			// trim end segment so it terminates between the camera plane and the near plane
+
+			// conservative estimate of the near plane
+			float a = projectionMatrix[ 2 ][ 2 ]; // 3nd entry in 3th column
+			float b = projectionMatrix[ 3 ][ 2 ]; // 3nd entry in 4th column
+			float nearEstimate = - 0.5 * b / a;
+
+			float alpha = ( nearEstimate - start.z ) / ( end.z - start.z );
+
+			end.xyz = mix( start.xyz, end.xyz, alpha );
+
+		}
+
+		void main() {
+
+			#ifdef USE_COLOR
+
+				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+
+			#endif
+
+			#ifdef USE_DASH
+
+				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
+				vUv = uv;
+
+			#endif
+
+			float aspect = resolution.x / resolution.y;
+
+			// camera space
+			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
+			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
+
+			#ifdef WORLD_UNITS
+
+				worldStart = start.xyz;
+				worldEnd = end.xyz;
+
+			#else
+
+				vUv = uv;
+
+			#endif
+
+			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
+			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
+			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
+			// perhaps there is a more elegant solution -- WestLangley
+
+			bool perspective = ( projectionMatrix[ 2 ][ 3 ] == - 1.0 ); // 4th entry in the 3rd column
+
+			if ( perspective ) {
+
+				if ( start.z < 0.0 && end.z >= 0.0 ) {
+
+					trimSegment( start, end );
+
+				} else if ( end.z < 0.0 && start.z >= 0.0 ) {
+
+					trimSegment( end, start );
+
+				}
+
+			}
+
+			// clip space
+			vec4 clipStart = projectionMatrix * start;
+			vec4 clipEnd = projectionMatrix * end;
+
+			// ndc space
+			vec3 ndcStart = clipStart.xyz / clipStart.w;
+			vec3 ndcEnd = clipEnd.xyz / clipEnd.w;
+
+			// direction
+			vec2 dir = ndcEnd.xy - ndcStart.xy;
+
+			// account for clip-space aspect ratio
+			dir.x *= aspect;
+			dir = normalize( dir );
+
+			#ifdef WORLD_UNITS
+
+				vec3 worldDir = normalize( end.xyz - start.xyz );
+				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
+				vec3 worldFwd = cross( worldDir, worldUp );
+				worldPos = position.y < 0.5 ? start: end;
+
+				// height offset
+				float hw = linewidth * 0.5;
+				worldPos.xyz += position.x < 0.0 ? hw * worldUp : - hw * worldUp;
+
+				// don't extend the line if we're rendering dashes because we
+				// won't be rendering the endcaps
+				#ifndef USE_DASH
+
+					// cap extension
+					worldPos.xyz += position.y < 0.5 ? - hw * worldDir : hw * worldDir;
+
+					// add width to the box
+					worldPos.xyz += worldFwd * hw;
+
+					// endcaps
+					if ( position.y > 1.0 || position.y < 0.0 ) {
+
+						worldPos.xyz -= worldFwd * 2.0 * hw;
+
+					}
+
+				#endif
+
+				// project the worldpos
+				vec4 clip = projectionMatrix * worldPos;
+
+				// shift the depth of the projected points so the line
+				// segments overlap neatly
+				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
+				clip.z = clipPose.z * clip.w;
+
+			#else
+
+				vec2 offset = vec2( dir.y, - dir.x );
+				// undo aspect ratio adjustment
+				dir.x /= aspect;
+				offset.x /= aspect;
+
+				// sign flip
+				if ( position.x < 0.0 ) offset *= - 1.0;
+
+				// endcaps
+				if ( position.y < 0.0 ) {
+
+					offset += - dir;
+
+				} else if ( position.y > 1.0 ) {
+
+					offset += dir;
+
+				}
+
+				// adjust for linewidth
+				offset *= linewidth;
+
+				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+				offset /= resolution.y;
+
+				// select end
+				vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
+
+				// back to clip space
+				offset *= clip.w;
+
+				clip.xy += offset;
+
+			#endif
+
+			gl_Position = clip;
+
+			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
+
+			#include <logdepthbuf_vertex>
+			#include <clipping_planes_vertex>
+			#include <fog_vertex>
+
+		}
+		`,fragmentShader:`
+		uniform vec3 diffuse;
+		uniform float opacity;
+		uniform float linewidth;
+
+		#ifdef USE_DASH
+
+			uniform float dashOffset;
+			uniform float dashSize;
+			uniform float gapSize;
+
+		#endif
+
+		varying float vLineDistance;
+
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
+
+		#include <common>
+		#include <color_pars_fragment>
+		#include <fog_pars_fragment>
+		#include <logdepthbuf_pars_fragment>
+		#include <clipping_planes_pars_fragment>
+
+		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
+
+			float mua;
+			float mub;
+
+			vec3 p13 = p1 - p3;
+			vec3 p43 = p4 - p3;
+
+			vec3 p21 = p2 - p1;
+
+			float d1343 = dot( p13, p43 );
+			float d4321 = dot( p43, p21 );
+			float d1321 = dot( p13, p21 );
+			float d4343 = dot( p43, p43 );
+			float d2121 = dot( p21, p21 );
+
+			float denom = d2121 * d4343 - d4321 * d4321;
+
+			float numer = d1343 * d4321 - d1321 * d4343;
+
+			mua = numer / denom;
+			mua = clamp( mua, 0.0, 1.0 );
+			mub = ( d1343 + d4321 * ( mua ) ) / d4343;
+			mub = clamp( mub, 0.0, 1.0 );
+
+			return vec2( mua, mub );
+
+		}
+
+		void main() {
+
+			float alpha = opacity;
+			vec4 diffuseColor = vec4( diffuse, alpha );
+
+			#include <clipping_planes_fragment>
+
+			#ifdef USE_DASH
+
+				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
+
+				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+
+			#endif
+
+			#ifdef WORLD_UNITS
+
+				// Find the closest points on the view ray and the line segment
+				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+				vec3 lineDir = worldEnd - worldStart;
+				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+				vec3 p1 = worldStart + lineDir * params.x;
+				vec3 p2 = rayEnd * params.y;
+				vec3 delta = p1 - p2;
+				float len = length( delta );
+				float norm = len / linewidth;
+
+				#ifndef USE_DASH
+
+					#ifdef USE_ALPHA_TO_COVERAGE
+
+						float dnorm = fwidth( norm );
+						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+					#else
+
+						if ( norm > 0.5 ) {
+
+							discard;
+
+						}
+
+					#endif
+
+				#endif
+
+			#else
+
+				#ifdef USE_ALPHA_TO_COVERAGE
+
+					// artifacts appear on some hardware if a derivative is taken within a conditional
+					float a = vUv.x;
+					float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+					float len2 = a * a + b * b;
+					float dlen = fwidth( len2 );
+
+					if ( abs( vUv.y ) > 1.0 ) {
+
+						alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+					}
+
+				#else
+
+					if ( abs( vUv.y ) > 1.0 ) {
+
+						float a = vUv.x;
+						float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+						float len2 = a * a + b * b;
+
+						if ( len2 > 1.0 ) discard;
+
+					}
+
+				#endif
+
+			#endif
+
+			#include <logdepthbuf_fragment>
+			#include <color_fragment>
+
+			gl_FragColor = vec4( diffuseColor.rgb, alpha );
+
+			#include <tonemapping_fragment>
+			#include <colorspace_fragment>
+			#include <fog_fragment>
+			#include <premultiplied_alpha_fragment>
+
+		}
+		`};let s21=class extends $9{constructor(e){super({type:"LineMaterial",uniforms:As.clone(S9.line.uniforms),vertexShader:S9.line.vertexShader,fragmentShader:S9.line.fragmentShader,clipping:!0}),this.isLineMaterial=!0,this.setValues(e)}get color(){return this.uniforms.diffuse.value}set color(e){this.uniforms.diffuse.value=e}get worldUnits(){return"WORLD_UNITS"in this.defines}set worldUnits(e){e===!0?this.defines.WORLD_UNITS="":delete this.defines.WORLD_UNITS}get linewidth(){return this.uniforms.linewidth.value}set linewidth(e){this.uniforms.linewidth&&(this.uniforms.linewidth.value=e)}get dashed(){return"USE_DASH"in this.defines}set dashed(e){e===!0!==this.dashed&&(this.needsUpdate=!0),e===!0?this.defines.USE_DASH="":delete this.defines.USE_DASH}get dashScale(){return this.uniforms.dashScale.value}set dashScale(e){this.uniforms.dashScale.value=e}get dashSize(){return this.uniforms.dashSize.value}set dashSize(e){this.uniforms.dashSize.value=e}get dashOffset(){return this.uniforms.dashOffset.value}set dashOffset(e){this.uniforms.dashOffset.value=e}get gapSize(){return this.uniforms.gapSize.value}set gapSize(e){this.uniforms.gapSize.value=e}get opacity(){return this.uniforms.opacity.value}set opacity(e){this.uniforms&&(this.uniforms.opacity.value=e)}get resolution(){return this.uniforms.resolution.value}set resolution(e){this.uniforms.resolution.value.copy(e)}get alphaToCoverage(){return"USE_ALPHA_TO_COVERAGE"in this.defines}set alphaToCoverage(e){this.defines&&(e===!0!==this.alphaToCoverage&&(this.needsUpdate=!0),e===!0?this.defines.USE_ALPHA_TO_COVERAGE="":delete this.defines.USE_ALPHA_TO_COVERAGE)}};const Jl=new a2,rv=new y,ov=new y,U9=new a2,z9=new a2,ee=new a2,Kl=new y,Yl=new q1,H9=new N8,iv=new y,ao=new r2,Co=new N2,te=new a2;let ue,W5;function av(s,e,t){return te.set(0,0,-e,1).applyMatrix4(s.projectionMatrix),te.multiplyScalar(1/te.w),te.x=W5/t.width,te.y=W5/t.height,te.applyMatrix4(s.projectionMatrixInverse),te.multiplyScalar(1/te.w),Math.abs(Math.max(te.x,te.y))}function Up0(s,e){const t=s.matrixWorld,n=s.geometry,r=n.attributes.instanceStart,o=n.attributes.instanceEnd,i=Math.min(n.instanceCount,r.count);for(let a=0,C=i;a<C;a++){H9.start.fromBufferAttribute(r,a),H9.end.fromBufferAttribute(o,a),H9.applyMatrix4(t);const l=new y,d=new y;ue.distanceSqToSegment(H9.start,H9.end,d,l),d.distanceTo(l)<W5*.5&&e.push({point:d,pointOnLine:l,distance:ue.origin.distanceTo(d),object:s,face:null,faceIndex:a,uv:null,uv1:null})}}function zp0(s,e,t){const n=e.projectionMatrix,o=s.material.resolution,i=s.matrixWorld,a=s.geometry,C=a.attributes.instanceStart,l=a.attributes.instanceEnd,d=Math.min(a.instanceCount,C.count),c=-e.near;ue.at(1,ee),ee.w=1,ee.applyMatrix4(e.matrixWorldInverse),ee.applyMatrix4(n),ee.multiplyScalar(1/ee.w),ee.x*=o.x/2,ee.y*=o.y/2,ee.z=0,Kl.copy(ee),Yl.multiplyMatrices(e.matrixWorldInverse,i);for(let u=0,p=d;u<p;u++){if(U9.fromBufferAttribute(C,u),z9.fromBufferAttribute(l,u),U9.w=1,z9.w=1,U9.applyMatrix4(Yl),z9.applyMatrix4(Yl),U9.z>c&&z9.z>c)continue;if(U9.z>c){const x=U9.z-z9.z,L=(U9.z-c)/x;U9.lerp(z9,L)}else if(z9.z>c){const x=z9.z-U9.z,L=(z9.z-c)/x;z9.lerp(U9,L)}U9.applyMatrix4(n),z9.applyMatrix4(n),U9.multiplyScalar(1/U9.w),z9.multiplyScalar(1/z9.w),U9.x*=o.x/2,U9.y*=o.y/2,z9.x*=o.x/2,z9.y*=o.y/2,H9.start.copy(U9),H9.start.z=0,H9.end.copy(z9),H9.end.z=0;const v=H9.closestPointToPointParameter(Kl,!0);H9.at(v,iv);const g=c4.lerp(U9.z,z9.z,v),m=g>=-1&&g<=1,w=Kl.distanceTo(iv)<W5*.5;if(m&&w){H9.start.fromBufferAttribute(C,u),H9.end.fromBufferAttribute(l,u),H9.start.applyMatrix4(i),H9.end.applyMatrix4(i);const x=new y,L=new y;ue.distanceSqToSegment(H9.start,H9.end,L,x),t.push({point:L,pointOnLine:x,distance:ue.origin.distanceTo(L),object:s,face:null,faceIndex:u,uv:null,uv1:null})}}}class Gp0 extends p0{constructor(e=new n21,t=new s21({color:Math.random()*16777215})){super(e,t),this.isLineSegments2=!0,this.type="LineSegments2"}computeLineDistances(){const e=this.geometry,t=e.attributes.instanceStart,n=e.attributes.instanceEnd,r=new Float32Array(2*t.count);for(let i=0,a=0,C=t.count;i<C;i++,a+=2)rv.fromBufferAttribute(t,i),ov.fromBufferAttribute(n,i),r[a]=a===0?0:r[a-1],r[a+1]=r[a]+rv.distanceTo(ov);const o=new lc(r,2,1);return e.setAttribute("instanceDistanceStart",new he(o,1,0)),e.setAttribute("instanceDistanceEnd",new he(o,1,1)),this}raycast(e,t){const n=this.material.worldUnits,r=e.camera;r===null&&!n&&console.error('LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2 while worldUnits is set to false.');const o=e.params.Line2!==void 0&&e.params.Line2.threshold||0;ue=e.ray;const i=this.matrixWorld,a=this.geometry,C=this.material;W5=C.linewidth+o,a.boundingSphere===null&&a.computeBoundingSphere(),Co.copy(a.boundingSphere).applyMatrix4(i);let l;if(n)l=W5*.5;else{const c=Math.max(r.near,Co.distanceToPoint(ue.origin));l=av(r,c,C.resolution)}if(Co.radius+=l,ue.intersectsSphere(Co)===!1)return;a.boundingBox===null&&a.computeBoundingBox(),ao.copy(a.boundingBox).applyMatrix4(i);let d;if(n)d=W5*.5;else{const c=Math.max(r.near,ao.distanceToPoint(ue.origin));d=av(r,c,C.resolution)}ao.expandByScalar(d),ue.intersectsBox(ao)!==!1&&(n?Up0(this,t):zp0(this,r,t))}onBeforeRender(e){const t=this.material.uniforms;t&&t.resolution&&(e.getViewport(Jl),this.material.uniforms.resolution.value.set(Jl.z,Jl.w))}}class r21 extends n21{constructor(){super(),this.isLineGeometry=!0,this.type="LineGeometry"}setPositions(e){const t=e.length-3,n=new Float32Array(2*t);for(let r=0;r<t;r+=3)n[2*r]=e[r],n[2*r+1]=e[r+1],n[2*r+2]=e[r+2],n[2*r+3]=e[r+3],n[2*r+4]=e[r+4],n[2*r+5]=e[r+5];return super.setPositions(n),this}setColors(e){const t=e.length-3,n=new Float32Array(2*t);for(let r=0;r<t;r+=3)n[2*r]=e[r],n[2*r+1]=e[r+1],n[2*r+2]=e[r+2],n[2*r+3]=e[r+3],n[2*r+4]=e[r+4],n[2*r+5]=e[r+5];return super.setColors(n),this}setFromPoints(e){const t=e.length-1,n=new Float32Array(6*t);for(let r=0;r<t;r++)n[6*r]=e[r].x,n[6*r+1]=e[r].y,n[6*r+2]=e[r].z||0,n[6*r+3]=e[r+1].x,n[6*r+4]=e[r+1].y,n[6*r+5]=e[r+1].z||0;return super.setPositions(n),this}fromLine(e){const t=e.geometry;return this.setPositions(t.attributes.position.array),this}}class Hp0 extends Gp0{constructor(e=new r21,t=new s21({color:Math.random()*16777215})){super(e,t),this.isLine2=!0,this.type="Line2"}}i0.linee={linewidth:{value:1},color:{value:new l0(16777215)},startPoint:{value:new y},endPoint:{value:new y}};S9.linee={uniforms:As.merge([i0.common,i0.fog,i0.linee]),vertexShader:`
+		#include <common>
+		#include <color_pars_vertex>
+		#include <fog_pars_vertex>
+		#include <logdepthbuf_pars_vertex>
+		#include <clipping_planes_pars_vertex>
+
+		uniform float linewidth;
+		uniform vec3 startPoint;
+		uniform vec3 endPoint;
+		varying float vDistanceAlpha;
+
+		attribute vec3 instanceStart;
+		attribute vec3 instanceEnd;
+
+		attribute vec3 instanceColorStart;
+		attribute vec3 instanceColorEnd;
+
+		varying vec4 worldPos;
+		varying vec3 worldStart;
+		varying vec3 worldEnd;
+
+		void trimSegment( const in vec4 start, inout vec4 end ) {
+
+			// trim end segment so it terminates between the camera plane and the near plane
+
+			// conservative estimate of the near plane
+			float a = projectionMatrix[ 2 ][ 2 ]; // 3nd entry in 3th column
+			float b = projectionMatrix[ 3 ][ 2 ]; // 3nd entry in 4th column
+			float nearEstimate = - 0.5 * b / a;
+
+			float alpha = ( nearEstimate - start.z ) / ( end.z - start.z );
+
+			end.xyz = mix( start.xyz, end.xyz, alpha );
+
+		}
+
+		void main() {
+
+			#ifdef USE_COLOR
+
+				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
+
+			#endif
+
+			// camera space
+			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
+			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
+
+
+			worldStart = start.xyz;
+			worldEnd = end.xyz;
+
+			vec3 currentPosition = (position.y < 0.5) ? instanceStart : instanceEnd;
+    	float distanceToStart = length(currentPosition - startPoint);
+			float startAlpha = smoothstep(0.0, 0.8, distanceToStart);
+    	float distanceToEnd = length(currentPosition - endPoint);
+			float endAlpha = smoothstep(0.5, 2.0, distanceToEnd);
+    	// Compute vDistanceAlpha using smoothstep
+    	vDistanceAlpha = min(startAlpha, endAlpha);
+			
+
+			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
+			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
+			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
+			// perhaps there is a more elegant solution -- WestLangley
+
+			bool perspective = ( projectionMatrix[ 2 ][ 3 ] == - 1.0 ); // 4th entry in the 3rd column
+
+			if ( perspective ) {
+
+				if ( start.z < 0.0 && end.z >= 0.0 ) {
+
+					trimSegment( start, end );
+
+				} else if ( end.z < 0.0 && start.z >= 0.0 ) {
+
+					trimSegment( end, start );
+
+				}
+
+			}
+
+			// clip space
+			vec4 clipStart = projectionMatrix * start;
+			vec4 clipEnd = projectionMatrix * end;
+
+			// ndc space
+			vec3 ndcStart = clipStart.xyz / clipStart.w;
+			vec3 ndcEnd = clipEnd.xyz / clipEnd.w;
+
+			// direction
+			vec2 dir = ndcEnd.xy - ndcStart.xy;
+			dir = normalize( dir );
+
+			vec3 worldDir = normalize( end.xyz - start.xyz );
+			vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+			vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
+			vec3 worldFwd = cross( worldDir, worldUp );
+			worldPos = position.y < 0.5 ? start: end;
+
+			// height offset
+			float hw = linewidth * 0.5;
+			worldPos.xyz += position.x < 0.0 ? hw * worldUp : - hw * worldUp;
+
+			// don't extend the line if we're rendering dashes because we
+			// won't be rendering the endcaps
+
+			// cap extension
+			worldPos.xyz += position.y < 0.5 ? - hw * worldDir : hw * worldDir;
+
+			// add width to the box
+			worldPos.xyz += worldFwd * hw;
+
+			// endcaps
+			if ( position.y > 1.0 || position.y < 0.0 ) {
+
+				worldPos.xyz -= worldFwd * 2.0 * hw;
+
+			}
+
+
+			// project the worldpos
+			vec4 clip = projectionMatrix * worldPos;
+
+			// shift the depth of the projected points so the line
+			// segments overlap neatly
+			vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
+			clip.z = clipPose.z * clip.w;
+
+			gl_Position = clip;
+
+			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
+
+			#include <logdepthbuf_vertex>
+			#include <clipping_planes_vertex>
+			#include <fog_vertex>
+
+		}
+		`,fragmentShader:`
+		uniform float linewidth;
+
+		varying vec4 worldPos;
+		varying vec3 worldStart;
+		varying vec3 worldEnd;
+		varying float vDistanceAlpha;
+
+		#include <common>
+		#include <color_pars_fragment>
+		#include <fog_pars_fragment>
+		#include <logdepthbuf_pars_fragment>
+		#include <clipping_planes_pars_fragment>
+
+		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
+
+			float mua;
+			float mub;
+
+			vec3 p13 = p1 - p3;
+			vec3 p43 = p4 - p3;
+
+			vec3 p21 = p2 - p1;
+
+			float d1343 = dot( p13, p43 );
+			float d4321 = dot( p43, p21 );
+			float d1321 = dot( p13, p21 );
+			float d4343 = dot( p43, p43 );
+			float d2121 = dot( p21, p21 );
+
+			float denom = d2121 * d4343 - d4321 * d4321;
+
+			float numer = d1343 * d4321 - d1321 * d4343;
+
+			mua = numer / denom;
+			mua = clamp( mua, 0.0, 1.0 );
+			mub = ( d1343 + d4321 * ( mua ) ) / d4343;
+			mub = clamp( mub, 0.0, 1.0 );
+
+			return vec2( mua, mub );
+
+		}
+
+		void main() {
+
+			#include <clipping_planes_fragment>
+
+			// Find the closest points on the view ray and the line segment
+			vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+			vec3 lineDir = worldEnd - worldStart;
+			vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+			vec3 p1 = worldStart + lineDir * params.x;
+			vec3 p2 = rayEnd * params.y;
+			vec3 delta = p1 - p2;
+			float len = length( delta );
+			float norm = len / linewidth;
+
+			if ( norm > 0.5 ) {
+				discard;
+			}
+
+			#include <logdepthbuf_fragment>
+
+			gl_FragColor = vec4( 1.0, 1.0, 1.0, vDistanceAlpha );
+
+			#include <tonemapping_fragment>
+			#include <colorspace_fragment>
+			#include <fog_fragment>
+			#include <premultiplied_alpha_fragment>
+
+		}
+		`};class jp0 extends $9{constructor(e){super({type:"LineMaterial",uniforms:As.clone(S9.linee.uniforms),vertexShader:S9.linee.vertexShader,fragmentShader:S9.linee.fragmentShader,clipping:!0}),this.isLineMaterial=!0,this._worldUnits=!0,this.setValues(e)}get color(){return this.uniforms.diffuse.value}set color(e){this.uniforms.diffuse.value=e}get linewidth(){return this.uniforms.linewidth.value}set linewidth(e){this.uniforms.linewidth&&(this.uniforms.linewidth.value=e)}get dashed(){return"USE_DASH"in this.defines}set dashed(e){e===!0!==this.dashed&&(this.needsUpdate=!0),e===!0?this.defines.USE_DASH="":delete this.defines.USE_DASH}get opacity(){return this.uniforms.opacity.value}set opacity(e){this.uniforms&&(this.uniforms.opacity.value=e)}get worldUnits(){return this._worldUnits}set worldUnits(e){this._worldUnits=!!e}}const Cv={valid:new l0(16777215),invalid:new l0(15549239)},lv={valid:new y(1,1,1),invalid:new y(.5,.5,.5)};class Xl extends L2({},{rayGravity:{type:z.Float32,default:-.4},locomotor:{type:z.Object,default:void 0},inputProvider:{type:z.Object,default:void 0},microGestureControlsEnabled:{type:z.Boolean,default:!1}}){constructor(){super(...arguments),this.rayOrigin=new y,this.rayDirection=new y,this.targetValid=!1,this.teleportWasActive=!1}init(){this.locomotor=this.config.locomotor.value,this.inputProvider=Xh("TeleportSystem",this.config.inputProvider.value),this.markerMat=new R0,this.teleportMarker=new p0(new vs(.12,.15).translate(0,0,.02),this.markerMat),this.scene.add(this.teleportMarker),this.markers=[];for(let n=0;n<20;n++)this.markers.push(new y(0,n,0));const e=new r21().setFromPoints(this.markers),t=new jp0({color:16777215,linewidth:.01,worldUnits:!0,vertexColors:!0,alphaToCoverage:!1,transparent:!0});this.line=new Hp0(e,t),this.line.frustumCulled=!1,this.scene.add(this.line),this.line.visible=!1,this.teleportMarker.visible=!1}destroy(){this.teleportMarker.removeFromParent(),this.line.removeFromParent()}update(){const e=this.locomotor.hitTestTarget,t=this.locomotor.hitTestNormal;this.targetValid=e.visible&&t.y>.7;const n=this.input.xr.multiPointers.right.getRayBusy();let r=this.inputProvider.getTeleportActive(n,this.config.microGestureControlsEnabled.value);if(r&&(this.inputProvider.getTeleportRay(this.rayOrigin,this.rayDirection)||(r=!1)),r){this.teleportWasActive||(this.line.visible=!0,this.teleportMarker.visible=!0);const o=Math.max(this.player.position.y,this.teleportMarker.position.y);W01(this.rayOrigin,this.rayDirection,o,this.config.rayGravity.value,this.markers,1),this.line.geometry.setFromPoints(this.markers),this.line.material.uniforms.startPoint.value.copy(this.markers[0]),this.line.material.uniforms.endPoint.value.copy(this.markers[this.markers.length-1]),this.locomotor.requestHitTest(this.rayOrigin,this.rayDirection),this.teleportMarker.position.lerp(e.position,.2),this.teleportMarker.quaternion.slerp(e.quaternion,.2),this.markerMat.color.lerp(this.targetValid?Cv.valid:Cv.invalid,.2),this.teleportMarker.scale.lerp(this.targetValid?lv.valid:lv.invalid,.2)}else this.teleportWasActive&&(this.targetValid&&this.inputProvider.getTeleportCommit(this.config.microGestureControlsEnabled.value)&&this.locomotor.teleport(this.teleportMarker.position),this.line.visible=!1,this.teleportMarker.visible=!1);this.teleportWasActive=r}}class dv extends Z0{constructor(e=1,t=1,n=2,r=4,o=1,i=32,a=1,C=!1,l=0,d=Math.PI*2){super();const c=n/2,u=[],p=Math.atan2(t-e,n);for(let v=0;v<=r;v++){const g=v/r,m=-Math.PI/2+g*(Math.PI/2+p),w=t-o+o*Math.cos(m),x=-c+o+o*Math.sin(m);u.push(new w1(w,x))}for(let v=1;v<a;v++){const g=v/a,m=-c+o+g*(c-o-(-c+o)),w=c4.lerp(t,e,g);u.push(new w1(w,m))}for(let v=0;v<=r;v++){const g=v/r,m=p+g*(Math.PI/2),w=e-o+o*Math.cos(m),x=c-o+o*Math.sin(m);u.push(new w1(w,x))}const A=new $u(u,i,l,d);if(C)this.copy(A);else{const v=new $8(e-o,i,l,d);v.rotateX(-Math.PI/2),v.translate(0,c,0);const g=new $8(t-o,i,l,d);g.rotateX(Math.PI/2),g.translate(0,-c,0);const m=k11([A,v,g]);this.copy(m)}this.computeVertexNormals()}}const cv=new y(1,1,1);var F7;(function(s){s[s.SnapTurn=1]="SnapTurn",s[s.SmoothTurn=2]="SmoothTurn"})(F7||(F7={}));class Zl extends L2({},{turningMethod:{type:z.Int8,default:F7.SnapTurn},turningAngle:{type:z.Float32,default:45},turningSpeed:{type:z.Float32,default:180},microGestureControlsEnabled:{type:z.Boolean,default:!1},inputProvider:{type:z.Object,default:void 0}}){constructor(){super(...arguments),this.turnSignals=new _0,this.leftSignal=new p0(new dv(.004,.012,.022,4,.004).rotateZ(Math.PI/2)),this.rightSignal=new p0(new dv(.004,.012,.022,4,.004).rotateZ(-Math.PI/2)),this.playerHeadPosition=new y}init(){this.inputProvider=Xh("TurnSystem",this.config.inputProvider.value),this.turnSignals.add(this.leftSignal,this.rightSignal),this.leftSignal.position.set(-.015,.02,0),this.rightSignal.position.set(.055,.02,0),this.cleanupFuncs.push(this.config.turningMethod.subscribe(e=>{e===F7.SmoothTurn?this.turnSignals.removeFromParent():this.player.raySpaces.right.add(this.turnSignals)}))}destroy(){super.destroy(),this.turnSignals.removeFromParent()}update(e){this.config.turningMethod.value===F7.SmoothTurn?this.updateSmooth(e):this.updateSnap(e)}updateSmooth(e){const t=this.inputProvider.getTurnAxis(),n=this.config.turningSpeed.value/180*Math.PI;t!==0&&this.player.rotateY(-t*n*e)}updateSnap(e){const t=this.config.turningAngle.value/180*Math.PI,n=this.inputProvider.shouldShowTurnSignals(this.config.microGestureControlsEnabled.value);this.turnSignals.visible=n,n?(this.player.head.getWorldPosition(this.playerHeadPosition),this.turnSignals.lookAt(this.playerHeadPosition)):this.turnSignals.visible=!1;const r=this.inputProvider.getTurnLeftDown(this.config.microGestureControlsEnabled.value),o=this.inputProvider.getTurnRightDown(this.config.microGestureControlsEnabled.value);r?(this.player.rotateY(t),this.turnSignals.visible&&this.leftSignal.scale.setScalar(1.5)):o&&(this.player.rotateY(-t),this.turnSignals.visible&&this.rightSignal.scale.setScalar(1.5)),this.turnSignals.visible&&(this.leftSignal.scale.lerp(cv,5*e),this.rightSignal.scale.lerp(cv,5*e))}}class Ov0 extends L2({envs:{required:[N5]}},{initialPlayerPosition:{type:z.Vec3,default:[0,0,0]},useWorker:{type:z.Boolean,default:!0},comfortAssist:{type:z.Float32,default:.5},slidingSpeed:{type:z.Float32,default:5},turningMethod:{type:z.Int8,default:F7.SnapTurn},turningAngle:{type:z.Float32,default:45},turningSpeed:{type:z.Float32,default:180},rayGravity:{type:z.Float32,default:-.4},maxDropDistance:{type:z.Float32,default:5},jumpHeight:{type:z.Float32,default:1.5},jumpCooldown:{type:z.Float32,default:.1},enableJumping:{type:z.Boolean,default:!0},browserControls:{type:z.Object,default:!1}}){constructor(){super(...arguments),this.microGestureControlsEnabled=!1}setPlayerPosition(e){var t,n;(t=this.requestedPlayerPosition)!==null&&t!==void 0||(this.requestedPlayerPosition=new y),this.requestedPlayerPosition.copy(e),this.config.initialPlayerPosition.value=e.toArray(),this.player.position.copy(e),!((n=this.locomotor)===null||n===void 0)&&n.isInitialized()&&this.locomotor.teleport(e)}init(){this.player.position.fromArray(this.config.initialPlayerPosition.value),this.cleanupFuncs.push(this.world.onAuthoredPlayerPosition(e=>{this.setPlayerPosition(e)})),this.inputProvider=new t21(this.world),this.inputProvider.enableBrowserControls(this.config.browserControls.value),this.world.registerSystem(Zl,{configData:{turningMethod:this.config.turningMethod.value,turningAngle:this.config.turningAngle.value,turningSpeed:this.config.turningSpeed.value,microGestureControlsEnabled:!1,inputProvider:this.inputProvider}}),this.turnSystem=this.world.getSystem(Zl),this.initLocomotor().then(()=>{this.cleanupFuncs.push(this.config.rayGravity.subscribe(e=>{this.locomotor.updateConfig({rayGravity:e}),this.teleportSystem&&(this.teleportSystem.config.rayGravity.value=e)}),this.config.slidingSpeed.subscribe(e=>{this.slideSystem&&(this.slideSystem.config.maxSpeed.value=e)}),this.config.comfortAssist.subscribe(e=>{this.slideSystem&&(this.slideSystem.config.comfortAssist.value=e)}),this.config.turningMethod.subscribe(e=>{this.turnSystem.config.turningMethod.value=e}),this.config.turningAngle.subscribe(e=>{this.turnSystem.config.turningAngle.value=e}),this.config.turningSpeed.subscribe(e=>{this.turnSystem.config.turningSpeed.value=e}),this.config.maxDropDistance.subscribe(e=>{this.locomotor.updateConfig({maxDropDistance:e})}),this.config.jumpHeight.subscribe(e=>{this.locomotor.updateConfig({jumpHeight:e})}),this.config.jumpCooldown.subscribe(e=>{this.locomotor.updateConfig({jumpCooldown:e})}),this.config.enableJumping.subscribe(e=>{this.slideSystem&&(this.slideSystem.config.enableJumping.value=e)}))}),this.cleanupFuncs.push(this.queries.envs.subscribe("qualify",e=>{this.addEnvironmentToEngine(e)}),this.queries.envs.subscribe("disqualify",e=>{this.removeEnvironmentFromEngine(e)}))}async initLocomotor(){var e,t;const n={initialPlayerPosition:(t=(e=this.requestedPlayerPosition)===null||e===void 0?void 0:e.clone())!==null&&t!==void 0?t:new y().fromArray(this.config.initialPlayerPosition.value),rayGravity:this.config.rayGravity.value,maxDropDistance:this.config.maxDropDistance.value,jumpHeight:this.config.jumpHeight.value,jumpCooldown:this.config.jumpCooldown.value,useWorker:this.config.useWorker.value};this.locomotor=new Dh0(n),await this.locomotor.initialize(),this.requestedPlayerPosition!=null&&(this.locomotor.teleport(this.requestedPlayerPosition),this.player.position.copy(this.requestedPlayerPosition)),this.world.registerSystem(Xl,{configData:{rayGravity:this.config.rayGravity.value,locomotor:this.locomotor,inputProvider:this.inputProvider,microGestureControlsEnabled:!1}}),this.world.registerSystem(Wl,{configData:{maxSpeed:this.config.slidingSpeed.value,comfortAssist:this.config.comfortAssist.value,enableJumping:this.config.enableJumping.value,locomotor:this.locomotor,inputProvider:this.inputProvider}}),this.teleportSystem=this.world.getSystem(Xl),this.slideSystem=this.world.getSystem(Wl);for(const r of this.queries.envs.entities)this.addEnvironmentToEngine(r)}addEnvironmentToEngine(e){var t;if(!(!((t=this.locomotor)===null||t===void 0)&&t.isInitialized())||e.getValue(N5,"_initialized"))return;const n=e.object3D;if(!n?.isObject3D)return;const r=e.getValue(N5,"type");if(r!==null)try{const o=this.locomotor.addEnvironment(n,r);e.setValue(N5,"_envHandle",o),e.setValue(N5,"_initialized",!0)}catch(o){console.error("Failed to add environment to locomotion engine:",o)}}removeEnvironmentFromEngine(e){if(!this.locomotor)return;const t=e.getValue(N5,"_envHandle");t!==0&&t!==null&&this.locomotor.removeEnvironment(t)}update(e){if(this.locomotor&&(this.locomotor.updateKinematicEnvironments(),this.locomotor.update(e),this.player.position.copy(this.locomotor.position),this.input.xr.isPrimary("hand","right"))){const t=this.input.xr.gamepads.right;t&&(t.getButtonDownByIdx(7)?this.microGestureControlsEnabled||(this.microGestureControlsEnabled=!0,this.turnSystem&&(this.turnSystem.config.microGestureControlsEnabled.value=!0),this.teleportSystem&&(this.teleportSystem.config.microGestureControlsEnabled.value=!0)):t.getButtonDownByIdx(8)&&this.microGestureControlsEnabled&&(this.microGestureControlsEnabled=!1,this.turnSystem&&(this.turnSystem.config.microGestureControlsEnabled.value=!1),this.teleportSystem&&(this.teleportSystem.config.microGestureControlsEnabled.value=!1)))}}destroy(){super.destroy(),this.locomotor&&this.locomotor.terminate(),this.world.unregisterSystem(Zl),this.teleportSystem&&this.world.unregisterSystem(Xl),this.slideSystem&&this.world.unregisterSystem(Wl)}}function $p0(s){const e=s.object3D;!e||e.__visibilityAttached||(e.__visibilityAttached=!0,Object.defineProperty(e,"visible",{get:()=>!!at.data.isVisible[s.index],set:t=>{s.setValue(at,"isVisible",t)},enumerable:!0,configurable:!0}))}function Vp0(s){const e=s.object3D;if(!e||!e.__visibilityAttached)return;const t=!!at.data.isVisible[s.index];Object.defineProperty(e,"visible",{value:t,writable:!0,enumerable:!0,configurable:!0}),delete e.__visibilityAttached}class Tv0 extends L2({visibility:{required:[at]}}){init(){this.queries.visibility.subscribe("qualify",$p0),this.queries.visibility.subscribe("disqualify",Vp0)}}class uv{constructor(e,t,n,r){this.available=[],this.allInstances=[],this.container=new _0,r.add(this.container);for(let o=0;o<t;o++){const i=n?new gw(e):new Aw(e);this.container.add(i),this.available.push(i),this.allInstances.push(i)}}acquire(){return this.available.length===0?null:this.available.pop()}release(e){e.isPlaying&&e.stop(),e.setVolume(1),this.available.includes(e)||this.available.push(e)}releaseAll(){for(const e of this.allInstances)e.isPlaying&&e.stop(),e.setVolume(1);this.available=[...this.allInstances]}dispose(){for(const e of this.allInstances)e.isPlaying&&e.stop(),e.disconnect();this.container.removeFromParent(),this.container.clear(),this.available=[],this.allInstances=[]}getActiveCount(){return this.allInstances.length-this.available.length}getTotalCount(){return this.allInstances.length}getAllInstances(){return this.allInstances}}class Dv0 extends L2({audioEntities:{required:[k0]}},{enableDistanceCulling:{type:z.Boolean,default:!0},cullingDistanceMultiplier:{type:z.Float32,default:1.5}}){constructor(){super(...arguments),this.activeInstances=new Map,this.onXRSessionStart=()=>{const e=this.listener.context;e.state==="suspended"&&e.resume();for(const[,t]of this.activeInstances)t.forEach(n=>{n.pausedBySessionEnd&&(n.audio.play(),n.pausedBySessionEnd=!1)})},this.onXRSessionEnd=()=>{for(const[,t]of this.activeInstances)t.forEach(n=>{n.audio.isPlaying&&(n.audio.pause(),n.pausedBySessionEnd=!0)});const e=this.listener.context;e.state==="running"&&e.suspend()}}init(){this.listener=new k41,this.player.head.add(this.listener),this.renderer.xr.addEventListener("sessionstart",this.onXRSessionStart),this.renderer.xr.addEventListener("sessionend",this.onXRSessionEnd),this.queries.audioEntities.subscribe("disqualify",e=>{this.cleanupEntity(e)})}update(e,t){const n=t,r=this.queries.audioEntities.entities;r.size!==0&&r.forEach(o=>{const i=o.index;if(!k0.data._loaded[i]&&!k0.data._loading[i]){const a=k0.data.src[i];a&&this.loadAudio(o,a);return}k0.data._loaded[i]&&(k0.data._pool[i]||this.createPool(o),this.handlePlaybackRequests(o,n),this.updateActiveInstances(o,n),k0.data.autoplay[i]&&!k0.data._isPlaying[i]&&k0.data._playRequested[i]===0&&(k0.data._playRequested[i]=1,k0.data.autoplay[i]=0))})}async loadAudio(e,t){const n=e.index;k0.data._loading[n]=1;try{let r=c8.getAudio(t);r||(r=await c8.loadAudio(t)),k0.data._buffer[n]=r,k0.data._loaded[n]=1}catch(r){console.error(`Failed to load audio: ${t}`,r)}finally{k0.data._loading[n]=0}}createPool(e){const t=e.index,n=k0.data.maxInstances[t],r=k0.data.positional[t],o=e.object3D||this.scene,i=n,a=r===1?new uv(this.listener,i,!0,o):new uv(this.listener,i,!1,o);k0.data._pool[t]=a,r&&a.getAllInstances().forEach(d=>{d.setRefDistance(k0.data.refDistance[t]),d.setRolloffFactor(k0.data.rolloffFactor[t]),d.setMaxDistance(k0.data.maxDistance[t]),d.setDistanceModel(k0.data.distanceModel[t]),d.setDirectionalCone(k0.data.coneInnerAngle[t],k0.data.coneOuterAngle[t],k0.data.coneOuterGain[t])})}handlePlaybackRequests(e,t){const n=e.index;if(k0.data._stopRequested[n]){this.stopAllInstances(e),k0.data._stopRequested[n]=0,k0.data._playRequested[n]=0,k0.data._pauseRequested[n]=0;return}if(k0.data._pauseRequested[n]){const r=k0.data._fadeOut[n];this.pauseAllInstances(e,r,t),k0.data._pauseRequested[n]=0;return}if(k0.data._playRequested[n]&&k0.data._loaded[n]){const r=k0.data.playbackMode[n],o=k0.data._fadeIn[n];switch(r){case x7.Restart:this.playRestart(e,o,t);break;case x7.Overlap:this.playOverlap(e,o,t);break;case x7.Ignore:this.playIgnore(e,o,t);break;case x7.FadeRestart:this.playFadeRestart(e,t);break}k0.data._playRequested[n]=0}}playRestart(e,t,n){this.stopAllInstances(e),this.createAndPlayInstance(e,t,n)}playOverlap(e,t,n){const r=e.index,o=this.activeInstances.get(e)||[],i=k0.data.maxInstances[r];if(o.length<i)this.createAndPlayInstance(e,t,n);else{const a=k0.data.instanceStealPolicy[r];this.stealInstance(e,o,a,n),this.createAndPlayInstance(e,t,n)}}playIgnore(e,t,n){(this.activeInstances.get(e)||[]).length===0&&this.createAndPlayInstance(e,t,n)}playFadeRestart(e,t){const n=e.index,r=k0.data.crossfadeDuration[n];(this.activeInstances.get(e)||[]).forEach(i=>{i.isFadingOut=!0,i.fadeStartTime=t,i.fadeStartVolume=i.audio.getVolume(),i.fadeDuration=r}),this.createAndPlayInstance(e,r,t)}createAndPlayInstance(e,t,n){const r=e.index,o=k0.data._pool[r],i=k0.data._buffer[r];if(!o||!i)return;const a=o.acquire();if(!a)return;a.setBuffer(i);const C=k0.data.loop[r]===1;a.setLoop(C),a.setVolume(t>0?0:k0.data.volume[r]);const l={audio:a,startTime:n};t>0&&(l.isFadingIn=!0,l.fadeStartTime=l.startTime,l.fadeStartVolume=0,l.fadeDuration=t);const d=this.activeInstances.get(e)||[];d.push(l),this.activeInstances.set(e,d),a.play(),k0.data._isPlaying[r]=1,a.source?a.source.onended=()=>{this.onInstanceEnded(e,l)}:l.onendedTimeout=setTimeout(()=>{l.onendedTimeout=void 0,a.source&&(a.source.onended=()=>{this.onInstanceEnded(e,l)})},10)}clearInstanceTimeout(e){e.onendedTimeout!==void 0&&(clearTimeout(e.onendedTimeout),e.onendedTimeout=void 0)}updateActiveInstances(e,t){const n=this.activeInstances.get(e);if(!n||n.length===0)return;const r=e.index,o=t,i=k0.data.volume[r];for(let a=n.length-1;a>=0;a--){const C=n[a];if(C.isFadingIn&&C.fadeStartTime&&C.fadeDuration){const l=(o-C.fadeStartTime)/C.fadeDuration;if(l>=1)C.audio.setVolume(i),C.isFadingIn=!1;else{const d=i*l;C.audio.setVolume(d)}}if(C.isFadingOut&&C.fadeStartTime&&C.fadeDuration){const l=(o-C.fadeStartTime)/C.fadeDuration;if(l>=1)this.releaseInstance(e,
