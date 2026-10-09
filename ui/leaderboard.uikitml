@@ -1,6 +1,6 @@
-<div id="LeaderboardRoot" style="width: 120; background-color: #171226; border-color: #4dd2ff; border-width: 1; border-radius: 4; padding-top: 7; padding-right: 9; padding-bottom: 7; padding-left: 9; display: flex; flex-direction: column; align-items: center; gap: 4;">
+<div id="LeaderboardRoot" style="width: 120; background-color: #1a1410; border-color: #ffb347; border-width: 1; border-radius: 4; padding-top: 7; padding-right: 9; padding-bottom: 7; padding-left: 9; display: flex; flex-direction: column; align-items: center; gap: 4;">
   <style>
-    .title { font-size: 4.6; font-weight: 700; color: #4dd2ff; text-align: center; }
+    .title { font-size: 4.6; font-weight: 700; color: #ffb347; text-align: center; }
     .lines { font-size: 3.2; color: #ffffff; text-align: left; }
   </style>
   <div id="BoardTitle" class="title">HALL OF RECORDS - LOCAL</div>

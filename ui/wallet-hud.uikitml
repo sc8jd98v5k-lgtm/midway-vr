@@ -1,8 +1,8 @@
-<div id="WalletHudRoot" style="width: 84; background-color: #171226; border-color: #06d6a0; border-width: 1; border-radius: 4; padding-top: 5; padding-right: 7; padding-bottom: 5; padding-left: 7; display: flex; flex-direction: column; align-items: center; gap: 2;">
+<div id="WalletHudRoot" style="width: 84; background-color: #1a1410; border-color: #d4a017; border-width: 1; border-radius: 4; padding-top: 5; padding-right: 7; padding-bottom: 5; padding-left: 7; display: flex; flex-direction: column; align-items: center; gap: 2;">
   <style>
-    .title { font-size: 4.2; font-weight: 700; color: #ff4fa3; text-align: center; }
+    .title { font-size: 4.2; font-weight: 700; color: #ffb347; text-align: center; }
     .tickets { font-size: 5; font-weight: 700; color: #ffd166; text-align: center; }
-    .meta { font-size: 3; font-weight: 700; color: #06d6a0; text-align: center; }
+    .meta { font-size: 3; font-weight: 700; color: #d4a017; text-align: center; }
     .notice { font-size: 3.2; font-weight: 700; color: #ffffff; text-align: center; }
     .row { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6; }
   </style>
