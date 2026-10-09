@@ -878,6 +878,26 @@
           0
         ]
       }
+    },
+    {
+      "content": {
+        "asset": "entranceArch",
+        "type": "asset"
+      },
+      "id": "entranceArch",
+      "name": "Carnival entrance arch",
+      "transform": {
+        "position": [
+          0,
+          0,
+          10
+        ],
+        "rotation": [
+          0,
+          180,
+          0
+        ]
+      }
     }
   ],
   "resources": {},
