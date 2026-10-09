@@ -1,1 +1,886 @@
-{"authoring":{"composition":{"feasibility":{"status":"supported"},"features":[],"input":{"kind":"hybrid","prompt":"Midway VR hub: night carnival plaza with light-pole strings, four booth shells, prize counter, leaderboard board, ferris wheel, teleport pads","references":[]},"mode":"static","provenance":{"adapter":{"id":"hybrid-intake","version":"1.0.0"},"capabilityHash":"sha256:bdbe0004ec492e94737deb90210bfbc753ad5dcbfee8318a5dcf5af3c4886cf5","inputHashes":["sha256:55ee3b34e51a1ce3b025ef356c615a04d9ada816bd2bb4b8aeab4e33b0d7579c"],"skill":{"id":"iwsdk-compose-scene","version":"1.0.0"}},"representationPolicy":{"allowed":["asset"],"fidelityCeiling":"stylized-static"},"review":{"heroView":"hero","lenses":["layout","geometry","final"],"maxCorrectionRounds":2,"requiredViews":["hero"]},"target":{"assetPolicy":"manifest-assets","style":"stylized-pbr","surfaces":["browser","vr"]}},"views":[{"fov":55,"id":"hero","position":[0,1.6,0.6],"projection":"perspective","role":"hero","target":[0,1.3,-3.5]}]},"components":{"com.iwsdk.components.DomeGradient":{"equator":[0.16,0.1,0.24,1],"ground":[0.035,0.03,0.07,1],"intensity":1,"sky":[0.035,0.05,0.13,1]},"com.iwsdk.components.IBLGradient":{"equator":[0.2,0.13,0.28,1],"ground":[0.05,0.04,0.09,1],"intensity":1.0,"sky":[0.06,0.07,0.16,1]}},"nodes":[{"content":{"asset":"plazaGround","type":"asset"},"id":"plazaGround","name":"Plaza ground","transform":{"position":[0,0,0]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole1","name":"Light pole 1","transform":{"position":[-9,0,9]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole2","name":"Light pole 2","transform":{"position":[9,0,9]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole3","name":"Light pole 3","transform":{"position":[-9,0,-9]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole4","name":"Light pole 4","transform":{"position":[9,0,-9]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole5","name":"Light pole 5","transform":{"position":[-12,0,0]}},{"content":{"asset":"lightPole","type":"asset"},"id":"pole6","name":"Light pole 6","transform":{"position":[12,0,0]}},{"content":{"asset":"lightString","type":"asset"},"id":"str1","name":"Light string S1: pole1-pole2","transform":{"position":[0,4.3,9],"rotationDeg":[0,0,0],"scale":[2.25,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str2","name":"Light string S2: pole3-pole4","transform":{"position":[0,4.3,-9],"rotationDeg":[0,0,0],"scale":[2.25,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str3","name":"Light string S3: pole1-pole3","transform":{"position":[-9,4.3,0],"rotationDeg":[0,90,0],"scale":[2.25,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str4","name":"Light string S4: pole2-pole4","transform":{"position":[9,4.3,0],"rotationDeg":[0,90,0],"scale":[2.25,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str5","name":"Light string S5: pole5-pole1","transform":{"position":[-10.5,4.3,4.5],"rotationDeg":[0,-71.6,0],"scale":[1.186,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str6","name":"Light string S6: pole5-pole3","transform":{"position":[-10.5,4.3,-4.5],"rotationDeg":[0,71.6,0],"scale":[1.186,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str7","name":"Light string S7: pole6-pole2","transform":{"position":[10.5,4.3,4.5],"rotationDeg":[0,-108.4,0],"scale":[1.186,1,1]}},{"content":{"asset":"lightString","type":"asset"},"id":"str8","name":"Light string S8: pole6-pole4","transform":{"position":[10.5,4.3,-4.5],"rotationDeg":[0,108.4,0],"scale":[1.186,1,1]}},{"content":{"asset":"ferrisWheel","type":"asset"},"id":"ferrisWheel","name":"Ferris wheel","transform":{"position":[13,0,-13]}},{"components":{"RayInteractable":{}},"content":{"asset":"prizeCounter","type":"asset"},"id":"prizeCounter","name":"Prize counter","transform":{"position":[0,0,-3.5],"rotationDeg":[0,0,0]}},{"content":{"asset":"leaderboardBoard","type":"asset"},"id":"leaderboardBoard","name":"Leaderboard board","transform":{"position":[4.2,0,-3.2],"rotationDeg":[0,-35,0]}},{"content":{"asset":"boothShell","type":"asset"},"id":"booth1","name":"Booth 1: Tin Duck Shoot","transform":{"position":[-7,0,-2],"rotationDeg":[0,90,0]}},{"content":{"asset":"boothShell","type":"asset"},"id":"booth2","name":"Booth 2: Whack-a-Mole","transform":{"position":[7,0,-2],"rotationDeg":[0,-90,0]}},{"content":{"asset":"boothShell","type":"asset"},"id":"booth3","name":"Booth 3: Ring Toss","transform":{"position":[-3.5,0,-9],"rotationDeg":[0,0,0]}},{"content":{"asset":"boothShell","type":"asset"},"id":"booth4","name":"Booth 4: High Striker","transform":{"position":[3.5,0,-9],"rotationDeg":[0,0,0]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":0,"destX":-5.4,"destY":0,"destYawDeg":90,"destZ":-2}},"content":{"asset":"teleportPad","type":"asset"},"id":"pad-booth1","name":"Teleport pad: booth 1","transform":{"position":[-4.2,0,-2]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":1,"destX":5.4,"destY":0,"destYawDeg":-90,"destZ":-2}},"content":{"asset":"teleportPad","type":"asset"},"id":"pad-booth2","name":"Teleport pad: booth 2","transform":{"position":[4.2,0,-2]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":2,"destX":-3.5,"destY":0,"destYawDeg":0,"destZ":-7.4}},"content":{"asset":"teleportPad","type":"asset"},"id":"pad-booth3","name":"Teleport pad: booth 3","transform":{"position":[-3.5,0,-6]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":3,"destX":3.5,"destY":0,"destYawDeg":0,"destZ":-7.4}},"content":{"asset":"teleportPad","type":"asset"},"id":"pad-booth4","name":"Teleport pad: booth 4","transform":{"position":[3.5,0,-6]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":-1,"destX":0,"destY":0,"destYawDeg":0,"destZ":-2.4}},"content":{"asset":"teleportPad","type":"asset"},"id":"pad-prizes","name":"Teleport pad: prize counter","transform":{"position":[0,0,-1.6]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":-1,"destX":0,"destY":0,"destYawDeg":0,"destZ":1.2}},"content":{"asset":"teleportPad","type":"asset"},"id":"booth1-exit","name":"Exit pad: booth 1","transform":{"position":[-5.4,0,-0.9]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":-1,"destX":0,"destY":0,"destYawDeg":0,"destZ":1.2}},"content":{"asset":"teleportPad","type":"asset"},"id":"booth2-exit","name":"Exit pad: booth 2","transform":{"position":[5.4,0,-0.9]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":-1,"destX":0,"destY":0,"destYawDeg":0,"destZ":1.2}},"content":{"asset":"teleportPad","type":"asset"},"id":"booth3-exit","name":"Exit pad: booth 3","transform":{"position":[-2.4,0,-7.4]}},{"components":{"RayInteractable":{},"TeleportPad":{"booth":-1,"destX":0,"destY":0,"destYawDeg":0,"destZ":1.2}},"content":{"asset":"teleportPad","type":"asset"},"id":"booth4-exit","name":"Exit pad: booth 4","transform":{"position":[4.6,0,-7.4]}},{"content":{"asset":"signDuck","type":"asset"},"id":"sign-booth1","name":"Booth 1 sign: Duck Gallery","transform":{"position":[-5.4,3.15,-2],"rotationDeg":[0,90,0]}},{"content":{"asset":"signMole","type":"asset"},"id":"sign-booth2","name":"Booth 2 sign: Whack-a-Mole","transform":{"position":[5.4,3.15,-2],"rotationDeg":[0,-90,0]}},{"content":{"asset":"signRing","type":"asset"},"id":"sign-booth3","name":"Booth 3 sign: Ring Toss","transform":{"position":[-3.5,3.15,-7.4],"rotationDeg":[0,0,0]}},{"content":{"asset":"signStriker","type":"asset"},"id":"sign-booth4","name":"Booth 4 sign: High Striker","transform":{"position":[3.5,3.15,-7.4],"rotationDeg":[0,0,0]}}],"resources":{},"units":"meters","version":"iwsdk.scene.v1"}
+{
+  "authoring": {
+    "composition": {
+      "feasibility": {
+        "status": "supported"
+      },
+      "features": [],
+      "input": {
+        "kind": "hybrid",
+        "prompt": "Midway VR hub: night carnival plaza with light-pole strings, four booth shells, prize counter, leaderboard board, ferris wheel, teleport pads",
+        "references": []
+      },
+      "mode": "static",
+      "provenance": {
+        "adapter": {
+          "id": "hybrid-intake",
+          "version": "1.0.0"
+        },
+        "capabilityHash": "sha256:bdbe0004ec492e94737deb90210bfbc753ad5dcbfee8318a5dcf5af3c4886cf5",
+        "inputHashes": [
+          "sha256:55ee3b34e51a1ce3b025ef356c615a04d9ada816bd2bb4b8aeab4e33b0d7579c"
+        ],
+        "skill": {
+          "id": "iwsdk-compose-scene",
+          "version": "1.0.0"
+        }
+      },
+      "representationPolicy": {
+        "allowed": [
+          "asset"
+        ],
+        "fidelityCeiling": "stylized-static"
+      },
+      "review": {
+        "heroView": "hero",
+        "lenses": [
+          "layout",
+          "geometry",
+          "final"
+        ],
+        "maxCorrectionRounds": 2,
+        "requiredViews": [
+          "hero"
+        ]
+      },
+      "target": {
+        "assetPolicy": "manifest-assets",
+        "style": "stylized-pbr",
+        "surfaces": [
+          "browser",
+          "vr"
+        ]
+      }
+    },
+    "views": [
+      {
+        "fov": 55,
+        "id": "hero",
+        "position": [
+          0,
+          1.6,
+          0.6
+        ],
+        "projection": "perspective",
+        "role": "hero",
+        "target": [
+          0,
+          1.3,
+          -3.5
+        ]
+      }
+    ]
+  },
+  "components": {
+    "com.iwsdk.components.DomeGradient": {
+      "equator": [
+        0.16,
+        0.1,
+        0.24,
+        1
+      ],
+      "ground": [
+        0.035,
+        0.03,
+        0.07,
+        1
+      ],
+      "intensity": 1,
+      "sky": [
+        0.035,
+        0.05,
+        0.13,
+        1
+      ]
+    },
+    "com.iwsdk.components.IBLGradient": {
+      "equator": [
+        0.2,
+        0.13,
+        0.28,
+        1
+      ],
+      "ground": [
+        0.05,
+        0.04,
+        0.09,
+        1
+      ],
+      "intensity": 1.0,
+      "sky": [
+        0.06,
+        0.07,
+        0.16,
+        1
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "content": {
+        "asset": "goldenHourSky",
+        "type": "asset"
+      },
+      "id": "goldenHourSky",
+      "name": "Golden hour sky",
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "plazaGround",
+        "type": "asset"
+      },
+      "id": "plazaGround",
+      "name": "Plaza ground",
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole1",
+      "name": "Light pole 1",
+      "transform": {
+        "position": [
+          -9,
+          0,
+          9
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole2",
+      "name": "Light pole 2",
+      "transform": {
+        "position": [
+          9,
+          0,
+          9
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole3",
+      "name": "Light pole 3",
+      "transform": {
+        "position": [
+          -9,
+          0,
+          -9
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole4",
+      "name": "Light pole 4",
+      "transform": {
+        "position": [
+          9,
+          0,
+          -9
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole5",
+      "name": "Light pole 5",
+      "transform": {
+        "position": [
+          -12,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightPole",
+        "type": "asset"
+      },
+      "id": "pole6",
+      "name": "Light pole 6",
+      "transform": {
+        "position": [
+          12,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str1",
+      "name": "Light string S1: pole1-pole2",
+      "transform": {
+        "position": [
+          0,
+          4.3,
+          9
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.25,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str2",
+      "name": "Light string S2: pole3-pole4",
+      "transform": {
+        "position": [
+          0,
+          4.3,
+          -9
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          2.25,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str3",
+      "name": "Light string S3: pole1-pole3",
+      "transform": {
+        "position": [
+          -9,
+          4.3,
+          0
+        ],
+        "rotationDeg": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          2.25,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str4",
+      "name": "Light string S4: pole2-pole4",
+      "transform": {
+        "position": [
+          9,
+          4.3,
+          0
+        ],
+        "rotationDeg": [
+          0,
+          90,
+          0
+        ],
+        "scale": [
+          2.25,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str5",
+      "name": "Light string S5: pole5-pole1",
+      "transform": {
+        "position": [
+          -10.5,
+          4.3,
+          4.5
+        ],
+        "rotationDeg": [
+          0,
+          -71.6,
+          0
+        ],
+        "scale": [
+          1.186,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str6",
+      "name": "Light string S6: pole5-pole3",
+      "transform": {
+        "position": [
+          -10.5,
+          4.3,
+          -4.5
+        ],
+        "rotationDeg": [
+          0,
+          71.6,
+          0
+        ],
+        "scale": [
+          1.186,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str7",
+      "name": "Light string S7: pole6-pole2",
+      "transform": {
+        "position": [
+          10.5,
+          4.3,
+          4.5
+        ],
+        "rotationDeg": [
+          0,
+          -108.4,
+          0
+        ],
+        "scale": [
+          1.186,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "lightString",
+        "type": "asset"
+      },
+      "id": "str8",
+      "name": "Light string S8: pole6-pole4",
+      "transform": {
+        "position": [
+          10.5,
+          4.3,
+          -4.5
+        ],
+        "rotationDeg": [
+          0,
+          108.4,
+          0
+        ],
+        "scale": [
+          1.186,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "ferrisWheel",
+        "type": "asset"
+      },
+      "id": "ferrisWheel",
+      "name": "Ferris wheel",
+      "transform": {
+        "position": [
+          13,
+          0,
+          -13
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {}
+      },
+      "content": {
+        "asset": "prizeCounter",
+        "type": "asset"
+      },
+      "id": "prizeCounter",
+      "name": "Prize counter",
+      "transform": {
+        "position": [
+          0,
+          0,
+          -3.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "leaderboardBoard",
+        "type": "asset"
+      },
+      "id": "leaderboardBoard",
+      "name": "Leaderboard board",
+      "transform": {
+        "position": [
+          4.2,
+          0,
+          -3.2
+        ],
+        "rotationDeg": [
+          0,
+          -35,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "boothShell",
+        "type": "asset"
+      },
+      "id": "booth1",
+      "name": "Booth 1: Tin Duck Shoot",
+      "transform": {
+        "position": [
+          -7,
+          0,
+          -2
+        ],
+        "rotationDeg": [
+          0,
+          90,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "boothShell",
+        "type": "asset"
+      },
+      "id": "booth2",
+      "name": "Booth 2: Whack-a-Mole",
+      "transform": {
+        "position": [
+          7,
+          0,
+          -2
+        ],
+        "rotationDeg": [
+          0,
+          -90,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "boothShell",
+        "type": "asset"
+      },
+      "id": "booth3",
+      "name": "Booth 3: Ring Toss",
+      "transform": {
+        "position": [
+          -3.5,
+          0,
+          -9
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "boothShell",
+        "type": "asset"
+      },
+      "id": "booth4",
+      "name": "Booth 4: High Striker",
+      "transform": {
+        "position": [
+          3.5,
+          0,
+          -9
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": 0,
+          "destX": -5.4,
+          "destY": 0,
+          "destYawDeg": 90,
+          "destZ": -2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "pad-booth1",
+      "name": "Teleport pad: booth 1",
+      "transform": {
+        "position": [
+          -4.2,
+          0,
+          -2
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": 1,
+          "destX": 5.4,
+          "destY": 0,
+          "destYawDeg": -90,
+          "destZ": -2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "pad-booth2",
+      "name": "Teleport pad: booth 2",
+      "transform": {
+        "position": [
+          4.2,
+          0,
+          -2
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": 2,
+          "destX": -3.5,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": -7.4
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "pad-booth3",
+      "name": "Teleport pad: booth 3",
+      "transform": {
+        "position": [
+          -3.5,
+          0,
+          -6
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": 3,
+          "destX": 3.5,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": -7.4
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "pad-booth4",
+      "name": "Teleport pad: booth 4",
+      "transform": {
+        "position": [
+          3.5,
+          0,
+          -6
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": -1,
+          "destX": 0,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": -2.4
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "pad-prizes",
+      "name": "Teleport pad: prize counter",
+      "transform": {
+        "position": [
+          0,
+          0,
+          -1.6
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": -1,
+          "destX": 0,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": 1.2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "booth1-exit",
+      "name": "Exit pad: booth 1",
+      "transform": {
+        "position": [
+          -5.4,
+          0,
+          -0.9
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": -1,
+          "destX": 0,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": 1.2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "booth2-exit",
+      "name": "Exit pad: booth 2",
+      "transform": {
+        "position": [
+          5.4,
+          0,
+          -0.9
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": -1,
+          "destX": 0,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": 1.2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "booth3-exit",
+      "name": "Exit pad: booth 3",
+      "transform": {
+        "position": [
+          -2.4,
+          0,
+          -7.4
+        ]
+      }
+    },
+    {
+      "components": {
+        "RayInteractable": {},
+        "TeleportPad": {
+          "booth": -1,
+          "destX": 0,
+          "destY": 0,
+          "destYawDeg": 0,
+          "destZ": 1.2
+        }
+      },
+      "content": {
+        "asset": "teleportPad",
+        "type": "asset"
+      },
+      "id": "booth4-exit",
+      "name": "Exit pad: booth 4",
+      "transform": {
+        "position": [
+          4.6,
+          0,
+          -7.4
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "signDuck",
+        "type": "asset"
+      },
+      "id": "sign-booth1",
+      "name": "Booth 1 sign: Duck Gallery",
+      "transform": {
+        "position": [
+          -5.4,
+          3.15,
+          -2
+        ],
+        "rotationDeg": [
+          0,
+          90,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "signMole",
+        "type": "asset"
+      },
+      "id": "sign-booth2",
+      "name": "Booth 2 sign: Whack-a-Mole",
+      "transform": {
+        "position": [
+          5.4,
+          3.15,
+          -2
+        ],
+        "rotationDeg": [
+          0,
+          -90,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "signRing",
+        "type": "asset"
+      },
+      "id": "sign-booth3",
+      "name": "Booth 3 sign: Ring Toss",
+      "transform": {
+        "position": [
+          -3.5,
+          3.15,
+          -7.4
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "content": {
+        "asset": "signStriker",
+        "type": "asset"
+      },
+      "id": "sign-booth4",
+      "name": "Booth 4 sign: High Striker",
+      "transform": {
+        "position": [
+          3.5,
+          3.15,
+          -7.4
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "resources": {},
+  "units": "meters",
+  "version": "iwsdk.scene.v1"
+}
