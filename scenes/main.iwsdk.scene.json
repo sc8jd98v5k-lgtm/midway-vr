@@ -888,13 +888,13 @@
       "name": "Carnival entrance arch",
       "transform": {
         "position": [
-          -4,
           0,
-          -1
+          0,
+          10
         ],
         "rotationDeg": [
           0,
-          0,
+          180,
           0
         ]
       }
